@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D0B8BC3A-75EA-4DCA-8874-C2A2CC9F092C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BS.Common</RootNamespace>
+    <AssemblyName>BSFramework</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>bin\Debug\BSFramework.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Common, Version=5.0.414.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Microsoft Enterprise Library 4.0 - May 2008\Bin\Microsoft.Practices.EnterpriseLibrary.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Data, Version=5.0.414.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Microsoft Enterprise Library 4.0 - May 2008\Bin\Microsoft.Practices.EnterpriseLibrary.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Logging, Version=5.0.414.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Microsoft Enterprise Library 4.0 - May 2008\Bin\Microsoft.Practices.EnterpriseLibrary.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Ajax\AjaxBase.cs" />
+    <Compile Include="Ajax\Catalog.cs" />
+    <Compile Include="Ajax\PageInfo.cs" />
+    <Compile Include="Dao\BaseSqlDAO.cs" />
+    <Compile Include="Dao\BasicRowProcesor.cs" />
+    <Compile Include="Dao\Cache\PageCacheDAO.cs" />
+    <Compile Include="Dao\DBParam.cs" />
+    <Compile Include="Dao\EntityRowProcessor.cs" />
+    <Compile Include="Dao\File\BaseFileDAO.cs" />
+    <Compile Include="Dao\File\CatalogFileDAO.cs" />
+    <Compile Include="Dao\File\PageFileDAO.cs" />
+    <Compile Include="Dao\Handlers\BeanHandler.cs" />
+    <Compile Include="Dao\Handlers\BeanListHandler.cs" />
+    <Compile Include="Dao\Handlers\EntityHandler.cs" />
+    <Compile Include="Dao\Handlers\PageFilterHandler.cs" />
+    <Compile Include="Dao\Handlers\PageInfoHandler.cs" />
+    <Compile Include="Dao\IPageInfoDAO.cs" />
+    <Compile Include="Dao\Oracle\CatalogOracleDAO.cs" />
+    <Compile Include="Dao\ResultSetHandler.cs" />
+    <Compile Include="Dao\AbstractQueryRunner.cs" />
+    <Compile Include="Dao\IBaseDAO.cs" />
+    <Compile Include="Dao\ICatalogDAO.cs" />
+    <Compile Include="Dao\QueryRunner.cs" />
+    <Compile Include="Dao\RowProcessor.cs" />
+    <Compile Include="Dao\BaseDAO.cs" />
+    <Compile Include="Dao\Service\PageInfoServiceDAO.cs" />
+    <Compile Include="Dao\Sql\CatalogSqlDAO.cs" />
+    <Compile Include="Dao\Sql\PageSqlDAO.cs" />
+    <Compile Include="Dao\StatementWrapper.cs" />
+    <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Entities\EntityConverter.cs" />
+    <Compile Include="Entities\Field.cs" />
+    <Compile Include="Entities\Page\Page.cs" />
+    <Compile Include="Entities\Page\PageColumn.cs" />
+    <Compile Include="Entities\Page\PageField.cs" />
+    <Compile Include="Entities\Page\PageFilter.cs" />
+    <Compile Include="Entities\Page\PageFilterField.cs" />
+    <Compile Include="Entities\Page\PageListItem.cs" />
+    <Compile Include="Entities\Page\PageTab.cs" />
+    <Compile Include="Entities\TransOperation.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service References\BSFrameworkService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Utils\AggregateInfo.cs" />
+    <Compile Include="Utils\DbUtils.cs" />
+    <Compile Include="Utils\EntityUtils.cs" />
+    <Compile Include="Utils\FactoryUtils.cs" />
+    <Compile Include="Utils\FileUtils.cs" />
+    <Compile Include="Utils\FilterInfo.cs" />
+    <Compile Include="Utils\FilterInfoConverter.cs" />
+    <Compile Include="Utils\IQueryBuilder.cs" />
+    <Compile Include="Utils\LoggerHelper.cs" />
+    <Compile Include="Utils\OracleQueryBuilder.cs" />
+    <Compile Include="Utils\QueryBuilder.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="ClassDiagram1.cd" />
+    <None Include="Service References\BSFrameworkService\PageService.wsdl" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\BSFrameworkService\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\BSFrameworkService\PageService.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\BSFrameworkService\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\BSFrameworkService\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\BSFrameworkService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

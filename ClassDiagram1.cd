@@ -1,0 +1,359 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BS.Common.Ajax.AjaxBase" Collapsed="true">
+    <Position X="6.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAgAAgAAAAAQAAAAAAAEgAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Ajax\AjaxBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Ajax.Catalog" Collapsed="true">
+    <Position X="5.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>GAAEAAAAAAIAAAAAAEgMDAAAABABICAAQACAQAAAgAA=</HashCode>
+      <FileName>Ajax\Catalog.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Ajax.PageInfo" Collapsed="true">
+    <Position X="7.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BMQAgEAAABYAqAQQAAIABgAAAAgQAQAEAECAAAAAAIA=</HashCode>
+      <FileName>Ajax\PageInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Dao.AbstractQueryRunner" Collapsed="true">
+    <Position X="12.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>Dao\AbstractQueryRunner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Dao.BaseDAO" Collapsed="true">
+    <Position X="5.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Dao\BaseDAO.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Dao.BaseSqlDAO" Collapsed="true">
+    <Position X="7.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAEAAAAgAAgAAIAAAAAAAAAAAAABCgIAA=</HashCode>
+      <FileName>Dao\BaseSqlDAO.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="queryRunner" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="BS.Common.Dao.BasicRowProcesor" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="14" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAAAABAAAACAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Dao\BasicRowProcesor.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Orientation="Bottom" Position="0.1" />
+  </Class>
+  <Class Name="BS.Common.Dao.EntityRowProcessor" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="14" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABACAAAAAAAAACAAAAAAAAAAAAAAAGAAAAAAAQAAQAA=</HashCode>
+      <FileName>Dao\EntityRowProcessor.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.1" />
+  </Class>
+  <Class Name="BS.Common.Dao.QueryRunner">
+    <Position X="9.25" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAEAIAAAAAAgBAAAAACAAAAA=</HashCode>
+      <FileName>Dao\QueryRunner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Dao.Cache.PageCacheDAO" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEQAgEAAAAAAgAQAAAIAAAACAAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>Dao\Cache\PageCacheDAO.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BS.Common.Dao.File.BaseFileDAO" Collapsed="true">
+    <Position X="2" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAwAAkAAAAAAASAAAAARCEEAAABAAAAAAAABAA=</HashCode>
+      <FileName>Dao\File\BaseFileDAO.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Dao.File.CatalogFileDAO" Collapsed="true">
+    <Position X="0.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>FAAAAAAAAAAAEQAAACAEAAAAAAAAIAAAQAAAAAAAIAA=</HashCode>
+      <FileName>Dao\File\CatalogFileDAO.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BS.Common.Dao.File.PageFileDAO" Collapsed="true">
+    <Position X="3" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEQAgEAAAAAAgAQAAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Dao\File\PageFileDAO.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BS.Common.Dao.Handlers.BeanHandler&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAABAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Dao\Handlers\BeanHandler.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="processor" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BS.Common.Dao.Handlers.BeanListHandler&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="12" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAABAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Dao\Handlers\BeanListHandler.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="processor" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BS.Common.Dao.Handlers.EntityHandler&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="11.75" Y="9.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAIAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Dao\Handlers\EntityHandler.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="processor" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BS.Common.Dao.Handlers.PageInfoHandler&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="8.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAABAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Dao\Handlers\PageInfoHandler.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="processor" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BS.Common.Dao.Oracle.CatalogOracleDAO" Collapsed="true">
+    <Position X="5.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>FAAAAAAAAAAAAQAAAAAEAAAAAAAAIAAAQAAAAAAAAAA=</HashCode>
+      <FileName>Dao\Oracle\CatalogOracleDAO.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BS.Common.Dao.Sql.CatalogSqlDAO" Collapsed="true">
+    <Position X="7.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>FAAAAAAAAAAAAQAAAAAEAAAAAAAAIAAAQAAAAAAAAAA=</HashCode>
+      <FileName>Dao\Sql\CatalogSqlDAO.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BS.Common.Dao.Sql.PageSqlDAO" Collapsed="true">
+    <Position X="9.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEQAgEAAAAAAgAQAAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Dao\Sql\PageSqlDAO.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="BS.Common.Entities.Entity" Collapsed="true">
+    <Position X="13" Y="3.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>EACACIgggBAAAAAAAAAAAAAAAAEAAgABAAEAAAgAAAA=</HashCode>
+      <FileName>Entities\Entity.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="fields" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="BS.Common.Entities.EntityConverter" Collapsed="true">
+    <Position X="13.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAACBAAAAAAAAAEAAAAAA=</HashCode>
+      <FileName>Entities\EntityConverter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Entities.Field" Collapsed="true">
+    <Position X="15.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAIAAAAAAAAAAARAAAIAAAAAABAQAgAAAAA=</HashCode>
+      <FileName>Entities\Field.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="ForeignKey" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="BS.Common.Entities.ForeignKeyInfo" Collapsed="true">
+    <Position X="13" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAACCAAAAAAAAAAAAAQAAAQACAAA=</HashCode>
+      <FileName>Entities\Field.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Entities.Page.Page" Collapsed="true">
+    <Position X="17.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgACEAAAAAAAAEAAAAAEAAQAAAAEAEAAAAAAAQIAAAA=</HashCode>
+      <FileName>Entities\Page\Page.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="_tabs" />
+      <Field Name="_gridFields" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="BS.Common.Entities.Page.PageGridColumn" Collapsed="true">
+    <Position X="18" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACEAAACAAAAgAAAABAAFAAAAAAEAAIAAAAACIAAAA=</HashCode>
+      <FileName>Entities\Page\PageColumn.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Entities.Page.PageField" Collapsed="true">
+    <Position X="21.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAEAgAGAEAEAQAAAgAAACEAAiAAAAAARAQAAIAAAE=</HashCode>
+      <FileName>Entities\Page\PageField.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Entities.Page.PageListItem" Collapsed="true">
+    <Position X="20.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAQAAAAAgAAACAAAAACAAAAAAAAgCAIAAAI=</HashCode>
+      <FileName>Entities\Page\PageListItem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Entities.Page.PageTab" Collapsed="true">
+    <Position X="19.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACEAAAAAAAAAAAAACAAICAACAAAAAAAAAAAAIAiAE=</HashCode>
+      <FileName>Entities\Page\PageTab.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="_fields" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="BS.Common.Utils.DbUtils" Collapsed="true">
+    <Position X="17.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>Utils\DbUtils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Utils.EntityUtils" Collapsed="true">
+    <Position X="19.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAEAAACAAAAAAAAABAAAAQAgAAAAIAAAAAA=</HashCode>
+      <FileName>Utils\EntityUtils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Utils.FactoryUtils" Collapsed="true">
+    <Position X="19.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utils\FactoryUtils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Utils.FileUtils" Collapsed="true">
+    <Position X="21.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAA=</HashCode>
+      <FileName>Utils\FileUtils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Utils.FilterInfo" Collapsed="true">
+    <Position X="17.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAACAEBAAAAAAAAAAIAAAAQMAAAACAAAggAAA=</HashCode>
+      <FileName>Utils\FilterInfo.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="_columns" />
+      <Field Name="_sortColumn" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="BS.Common.Utils.ColumnInfo" Collapsed="true">
+    <Position X="20.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAIAAAQAAAAAAAAAAAAAACAgAAA=</HashCode>
+      <FileName>Utils\FilterInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Utils.SortColumn" Collapsed="true">
+    <Position X="20.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>Utils\FilterInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Utils.LoggerHelper" Collapsed="true">
+    <Position X="17.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAYAAAAAAABAAAAgAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Utils\LoggerHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Utils.OracleQueryBuilder" Collapsed="true">
+    <Position X="20" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAYAAAAACAAACCAAAAAAAAAAAAIAAAgAA=</HashCode>
+      <FileName>Utils\OracleQueryBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BS.Common.Utils.QueryBuilder" Collapsed="true">
+    <Position X="18.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAYAgAAACgAACCAAAAAEAAAAAAIAAAgAA=</HashCode>
+      <FileName>Utils\QueryBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="BS.Common.Dao.IBaseDAO" Collapsed="true">
+    <Position X="1.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Dao\IBaseDAO.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="BS.Common.Dao.ICatalogDAO" Collapsed="true">
+    <Position X="0.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>FAAAAAAAAAAAEQAAAAAEAAAAAAAAIAAAQAAAAAAAIAA=</HashCode>
+      <FileName>Dao\ICatalogDAO.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="BS.Common.Dao.IPageInfoDAO" Collapsed="true">
+    <Position X="2.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEQAgEAAAAAAgAQAAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Dao\IPageInfoDAO.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="BS.Common.Dao.ResultSetHandler&lt;T&gt;" Collapsed="true">
+    <Position X="10.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Dao\ResultSetHandler.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="BS.Common.Dao.RowProcessor" Collapsed="true">
+    <Position X="12" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Dao\RowProcessor.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

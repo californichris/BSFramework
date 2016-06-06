@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://www.beltransoft.com/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://www.beltransoft.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://www.beltransoft.com/">
+      <s:element name="GetPageConfig">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="appName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pageId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="pageName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetPageConfigResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetPageConfigResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SavePage">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="appName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="page" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SavePageResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="DeletePage">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="page" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DeletePageResponse">
+        <s:complexType />
+      </s:element>
+      <s:element name="GetPageList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="appName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetPageListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetPageListResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetPageListItems">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="fieldName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="orderBy" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="orderType" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetPageListItemsResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetPageListItemsResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetPageConfigSoapIn">
+    <wsdl:part name="parameters" element="tns:GetPageConfig" />
+  </wsdl:message>
+  <wsdl:message name="GetPageConfigSoapOut">
+    <wsdl:part name="parameters" element="tns:GetPageConfigResponse" />
+  </wsdl:message>
+  <wsdl:message name="SavePageSoapIn">
+    <wsdl:part name="parameters" element="tns:SavePage" />
+  </wsdl:message>
+  <wsdl:message name="SavePageSoapOut">
+    <wsdl:part name="parameters" element="tns:SavePageResponse" />
+  </wsdl:message>
+  <wsdl:message name="DeletePageSoapIn">
+    <wsdl:part name="parameters" element="tns:DeletePage" />
+  </wsdl:message>
+  <wsdl:message name="DeletePageSoapOut">
+    <wsdl:part name="parameters" element="tns:DeletePageResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetPageListSoapIn">
+    <wsdl:part name="parameters" element="tns:GetPageList" />
+  </wsdl:message>
+  <wsdl:message name="GetPageListSoapOut">
+    <wsdl:part name="parameters" element="tns:GetPageListResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetPageListItemsSoapIn">
+    <wsdl:part name="parameters" element="tns:GetPageListItems" />
+  </wsdl:message>
+  <wsdl:message name="GetPageListItemsSoapOut">
+    <wsdl:part name="parameters" element="tns:GetPageListItemsResponse" />
+  </wsdl:message>
+  <wsdl:portType name="PageServiceSoap">
+    <wsdl:operation name="GetPageConfig">
+      <wsdl:input message="tns:GetPageConfigSoapIn" />
+      <wsdl:output message="tns:GetPageConfigSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SavePage">
+      <wsdl:input message="tns:SavePageSoapIn" />
+      <wsdl:output message="tns:SavePageSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="DeletePage">
+      <wsdl:input message="tns:DeletePageSoapIn" />
+      <wsdl:output message="tns:DeletePageSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPageList">
+      <wsdl:input message="tns:GetPageListSoapIn" />
+      <wsdl:output message="tns:GetPageListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetPageListItems">
+      <wsdl:input message="tns:GetPageListItemsSoapIn" />
+      <wsdl:output message="tns:GetPageListItemsSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="PageServiceSoap" type="tns:PageServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetPageConfig">
+      <soap:operation soapAction="http://www.beltransoft.com/GetPageConfig" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SavePage">
+      <soap:operation soapAction="http://www.beltransoft.com/SavePage" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeletePage">
+      <soap:operation soapAction="http://www.beltransoft.com/DeletePage" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPageList">
+      <soap:operation soapAction="http://www.beltransoft.com/GetPageList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPageListItems">
+      <soap:operation soapAction="http://www.beltransoft.com/GetPageListItems" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="PageServiceSoap12" type="tns:PageServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetPageConfig">
+      <soap12:operation soapAction="http://www.beltransoft.com/GetPageConfig" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SavePage">
+      <soap12:operation soapAction="http://www.beltransoft.com/SavePage" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeletePage">
+      <soap12:operation soapAction="http://www.beltransoft.com/DeletePage" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPageList">
+      <soap12:operation soapAction="http://www.beltransoft.com/GetPageList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetPageListItems">
+      <soap12:operation soapAction="http://www.beltransoft.com/GetPageListItems" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="PageService">
+    <wsdl:port name="PageServiceSoap" binding="tns:PageServiceSoap">
+      <soap:address location="http://localhost/BSFrameworkService/PageService.asmx" />
+    </wsdl:port>
+    <wsdl:port name="PageServiceSoap12" binding="tns:PageServiceSoap12">
+      <soap12:address location="http://localhost/BSFrameworkService/PageService.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
