@@ -450,7 +450,12 @@ namespace BS.Common.Utils
                 else if (prop.PropertyType == typeof(String) && prop.Name != idField)
                 {
                     query.Append(prop.Name).Append(",");
-                    fieldValues.Append("'").Append(prop.GetValue(instance, null)).Append("',");
+
+                    string value = (string)prop.GetValue(instance, null);
+                    if (null != value)
+                        value = value.Replace("'", "''");
+
+                    fieldValues.Append("'").Append(value).Append("',");
                 }
                 else if ((prop.PropertyType == typeof(int) || (prop.PropertyType == typeof(double) || prop.PropertyType == typeof(decimal))) && prop.Name != idField)
                 {
