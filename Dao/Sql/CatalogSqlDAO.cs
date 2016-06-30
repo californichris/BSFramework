@@ -313,33 +313,7 @@ namespace BS.Common.Dao.Sql
             LoggerHelper.Info("Start");
             try
             {
-                StringBuilder query = new StringBuilder();
-                query.Append("DELETE FROM ").Append(GetQueryBuilder().GetTableName(entity));
-
-                StringBuilder where = new StringBuilder();
-                IList<DBParam> queryParams = new List<DBParam>();
-
-                foreach (KeyValuePair<string, string> pair in entity.GetProperties())
-                {
-                    if (!string.IsNullOrEmpty(pair.Value))
-                    {
-                        where.Append("[").Append(pair.Key).Append("]").Append(" = ").Append(QueryBuilder.Param).Append(queryParams.Count).Append(" AND ");
-                        queryParams.Add(new DBParam(queryParams, pair.Value, DbType.String, false));
-                    }
-                }
-
-                if (where.Length > 0)
-                {
-                    where.Remove(where.Length - 4, 4);
-                    query.Append(" WHERE ").Append(where);
-                }
-
-                LoggerHelper.Debug(query.ToString());
-                StatementWrapper wrapper = new StatementWrapper();
-                wrapper.Query = query;
-                wrapper.DBParams = queryParams;
-
-                GetQueryRunner().ExecuteNonQuery(GetConnection(), wrapper);
+                GetQueryRunner().ExecuteNonQuery(GetConnection(), BuildDeleteEntitiesStatement(entity));
             }
             catch (Exception e)
             {
@@ -384,6 +358,10 @@ namespace BS.Common.Dao.Sql
                     {
                         stmtWrapper = GetQueryBuilder().BuildDeleteStatement(operation.Entity); 
                     }
+                    else if (operation.OperationType == TransOperation.OperType.DeleteEntities)
+                    {
+                        stmtWrapper = BuildDeleteEntitiesStatement(operation.Entity);
+                    }
 
                     LoggerHelper.Debug(stmtWrapper.Query.ToString());
                     statements.Add(stmtWrapper);
@@ -393,12 +371,58 @@ namespace BS.Common.Dao.Sql
             }
             catch (Exception e)
             {
-                throw new Exception("Unable to execute transactions.", e);
+                if (e.Message.Contains("FK") || e.Message.Contains("REFERENCE"))
+                {
+                    throw new Exception("Entity cannot be deleted, because is being used.");
+                }
+                else if (e.Message.Contains("UNIQUE KEY"))
+                {
+                    throw new Exception("Entity already exists.");
+                }
+                else
+                {
+                    throw new Exception("Unable to execute transactions.", e);
+                }
+
+                
             }
             finally
             {
                 LoggerHelper.Info("End");
             }
+        }
+
+        private StatementWrapper BuildDeleteEntitiesStatement(Entity entity)
+        {
+            if (entity == null || string.IsNullOrEmpty(entity.GetTableName()))
+            {
+                LoggerHelper.Warning("Entity is null or entity TableName is not specified.");
+                throw new ArgumentNullException("Entity is null or entity TableName is not specified.");
+            }
+
+            StringBuilder query = new StringBuilder();
+            query.Append("DELETE FROM ").Append(GetQueryBuilder().GetTableName(entity));
+
+            StringBuilder where = new StringBuilder();
+            IList<DBParam> queryParams = new List<DBParam>();
+
+            foreach (KeyValuePair<string, string> pair in entity.GetProperties())
+            {
+                if (!string.IsNullOrEmpty(pair.Value))
+                {
+                    where.Append("[").Append(pair.Key).Append("]").Append(" = ").Append(QueryBuilder.Param).Append(queryParams.Count).Append(" AND ");
+                    queryParams.Add(new DBParam(queryParams, pair.Value, DbType.String, false));
+                }
+            }
+
+            if (where.Length > 0)
+            {
+                where.Remove(where.Length - 4, 4);
+                query.Append(" WHERE ").Append(where);
+            }
+
+            LoggerHelper.Debug(query.ToString());
+            return new StatementWrapper(query, queryParams);
         }
 
         public IList<Entity> GetAggregateEntities(Entity entity, AggregateInfo aggregateInfo, FilterInfo.SearchType searchType)

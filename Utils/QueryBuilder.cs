@@ -918,6 +918,7 @@ namespace BS.Common.Utils
 
             if (andWhere.Length > 0)
             {
+                TrimStringBuilder(andWhere);
                 andWhere.Remove(andWhere.Length - 3, 3);
                 if (orWhere.Length > 0)
                 {
@@ -930,6 +931,18 @@ namespace BS.Common.Utils
             {
                 query.Append(" WHERE ").Append(where);
             }
+        }
+
+        private void TrimStringBuilder(StringBuilder b)
+        {
+            do
+            {
+                if(char.IsWhiteSpace(b[b.Length - 1]))
+                {
+                     b.Remove(b.Length - 1,1);
+                }
+            }
+            while(char.IsWhiteSpace(b[b.Length - 1]));
         }
 
         public void AppendSearchCondition(StringBuilder where, Field field, string fieldName, string value, string type, IDictionary<string, string> aliases, IList<DBParam> queryParams)
@@ -1064,7 +1077,7 @@ namespace BS.Common.Utils
                     queryParams.Add(new DBParam(queryParams, rangeValues[1], field.GetDbType()));
                 }
             }
-            query.Append(") AND");
+            query.Append(") AND ");
         }
 
         public void AppendRange(StringBuilder query, string fieldName, string value)
@@ -1081,7 +1094,7 @@ namespace BS.Common.Utils
                 return;
             }
             
-            where.Append(fieldName).Append(" IN (");
+            where.Append(" ").Append(fieldName).Append(" IN (");
             string[] list = value.Split(new string[] { "," }, StringSplitOptions.None);
             foreach (string val in list)
             {

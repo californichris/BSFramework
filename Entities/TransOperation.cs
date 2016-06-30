@@ -20,7 +20,8 @@ namespace BS.Common.Entities
             /// <summary>
             /// Delete type
             /// </summary>
-            Delete
+            Delete,
+            DeleteEntities
         };
 
         /// <summary>
@@ -50,6 +51,10 @@ namespace BS.Common.Entities
             else if (operType.Equals("Delete", StringComparison.CurrentCultureIgnoreCase))
             {
                 this.OperationType = OperType.Delete;
+            }
+            else if (operType.Equals("DeleteEntities", StringComparison.CurrentCultureIgnoreCase))
+            {
+                this.OperationType = OperType.DeleteEntities;
             }
             else
             {

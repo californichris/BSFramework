@@ -73,6 +73,7 @@
     <Compile Include="Ajax\PageInfo.cs" />
     <Compile Include="Dao\BaseSqlDAO.cs" />
     <Compile Include="Dao\BasicRowProcesor.cs" />
+    <Compile Include="Dao\Cache\CatalogCacheDAO.cs" />
     <Compile Include="Dao\Cache\PageCacheDAO.cs" />
     <Compile Include="Dao\DBParam.cs" />
     <Compile Include="Dao\EntityRowProcessor.cs" />
