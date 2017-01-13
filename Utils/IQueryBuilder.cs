@@ -216,12 +216,46 @@ namespace BS.Common.Utils
         StatementWrapper BuildInsertStatement(Entity entity);
 
         /// <summary>
+        /// Builds an INSERT statement using the specified entity and append it to the provided StringBuilder 
+        /// as well as the statement parameters to the specified list.
+        /// </summary>
+        /// <param name="entity">The entity</param>
+        /// <param name="query">the stringbuilder</param>
+        /// <param name="queryParams">the statement param list</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when entity is null, entity TableName is not specified.</exception>
+        void BuildInsertStatement(Entity entity, StringBuilder query, IList<DBParam> queryParams);
+
+        /// <summary>
+        /// Builds an INSERT statement using the specified entity and append it to the provided StringBuilder 
+        /// as well as the statement parameters to the specified list.
+        /// 
+        /// If a field value is found in the defaultVals list it will be used instead of the entity value.
+        /// </summary>
+        /// <param name="entity">The entity</param>
+        /// <param name="query">the stringbuilder</param>
+        /// <param name="queryParams">the statement param list</param>
+        /// <param name="defaultVals">the defaultVals list</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when entity is null, entity TableName is not specified.</exception>
+        void BuildInsertStatement(Entity entity, StringBuilder query, IList<DBParam> queryParams, IDictionary<string, string> defaultVals);
+        
+        /// <summary>
         /// Builds an UPDATE statement using the specified entity. 
         /// </summary>
         /// <param name="entity">The entity</param>
         /// <exception cref="System.ArgumentNullException">Thrown when instance is null</exception>
         /// <returns>The Statement Wrapper containing the UPDATE statement and the statement parameters.</returns>
         StatementWrapper BuildUpdateStatement(Entity entity);
+
+        /// <summary>
+        /// Builds an UPDATE statement using the specified entity and append it to the provided StringBuilder 
+        /// as well as the statement parameters to the specified list.
+        /// </summary>
+        /// <param name="entity">The entity</param>
+        /// <param name="query">the stringbuilder</param>
+        /// <param name="queryParams">the statement param list</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when instance is null</exception>
+        /// <returns>The Statement Wrapper containing the UPDATE statement and the statement parameters.</returns>
+        void BuildUpdateStatement(Entity entity, StringBuilder query, IList<DBParam> queryParams);
 
         /// <summary>
         /// Builds an UPDATE statement using the specified entity properties. 
@@ -234,12 +268,67 @@ namespace BS.Common.Utils
         StatementWrapper BuildUpdateEntityStatement(Entity entity);
 
         /// <summary>
+        /// Builds an UPDATE statement using the specified entity properties. 
+        /// <para>The Field flag as the entitiy Id is used in the WHERE clause of the statement.</para>
+        /// <para>Fields flag as not updatable are not included in the statement.</para>
+        /// 
+        /// The statement will be append it to the provided StringBuilder 
+        /// as well as the statement parameters to the specified list.
+        /// </summary>
+        /// <param name="entity">An Entity</param>
+        /// <param name="query">the stringbuilder</param>
+        /// <param name="queryParams">the statement param list</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when entity is null, entity TableName is not specified.</exception>
+        /// <returns>The Statement Wrapper containing the UPDATE statement and the statement parameters.</returns>
+        void BuildUpdateEntityStatement(Entity entity, StringBuilder query, IList<DBParam> queryParams);
+
+        /// <summary>
         /// Builds a DELETE statement using the specified entity.
         /// </summary>
         /// <param name="entity">An Entity</param>
         /// <returns>The Statement Wrapper containing the DELETE statement and the statement parameters.</returns>
         StatementWrapper BuildDeleteStatement(Entity entity);
 
+        /// <summary>
+        /// Builds a DELETE statement using the specified entity.
+        /// 
+        /// The statement will be append it to the provided StringBuilder 
+        /// as well as the statement parameters to the specified list.
+        /// </summary>
+        /// <param name="entity">An Entity</param>
+        /// <param name="query">the StringBuilder</param>
+        /// <param name="queryParams">the statement param list</param>
+        void BuildDeleteStatement(Entity entity, StringBuilder query, IList<DBParam> queryParams);
+
+        /// <summary>
+        /// Builds a DELETE statement using the specified entity properties to construct the WHERE clause.
+        /// </summary>
+        /// <param name="entity">An Entity</param>
+        /// <returns>The Statement Wrapper containing the DELETE statement and the statement parameters.</returns>
+        StatementWrapper BuildDeleteEntitiesStatement(Entity entity);
+
+        /// <summary>
+        /// Builds a DELETE statement using the specified entity properties to construct the WHERE clause.
+        /// 
+        /// The statement will be append it to the provided StringBuilder 
+        /// as well as the statement parameters to the specified list.
+        /// </summary>
+        /// <param name="entity">An Entity</param>
+        /// <param name="query">the StringBuilder</param>
+        /// <param name="queryParams">the statement param list</param>
+        void BuildDeleteEntitiesStatement(Entity entity, StringBuilder query, IList<DBParam> queryParams);
+
+        /// <summary>
+        /// Builds a SELECT statement with the specified Aggregated Functions in the aggregatedInfo object.
+        /// 
+        /// And sets the fields of the specified Aggregated Entity
+        /// </summary>
+        /// <param name="entity">an Entity</param>
+        /// <param name="aggregateInfo">The aggregatedinfo object</param>
+        /// <param name="aggregateEntity">The aggregated entity</param>
+        /// <param name="filter">The filter info</param>
+        /// <param name="searchType">The search type</param>
+        /// <returns>The Statement Wrapper containing the SELECT statement and the statement parameters.</returns>
         StatementWrapper BuildAggregateStatement(Entity entity, AggregateInfo aggregateInfo, Entity aggregateEntity, FilterInfo.SearchType searchType, FilterInfo filter);
 
         /// <summary>
@@ -285,6 +374,18 @@ namespace BS.Common.Utils
         /// <returns>The field value</returns>
         string GetFieldValue(Entity entity, Field field);
 
+        /// <summary>
+        /// Returns the table name from the specified entity,
+        /// </summary>
+        /// <param name="entity">the entity</param>
+        /// <returns>the table name</returns>
         string GetTableName(Entity entity);
+
+        /// <summary>
+        /// Adds Open and Close Symetric key statements to a DB statement
+        /// </summary>
+        /// <param name="entity">the entity</param>
+        /// <param name="query"> the query of stringbuilder type passed by reference for appending</param>
+        void WrapEncryptKey(Entity entity, StringBuilder query);
     }
 }

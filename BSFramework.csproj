@@ -116,6 +116,7 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="Utils\AggregateInfo.cs" />
+    <Compile Include="Utils\BaseQueryBuilder.cs" />
     <Compile Include="Utils\DbUtils.cs" />
     <Compile Include="Utils\EntityUtils.cs" />
     <Compile Include="Utils\FactoryUtils.cs" />

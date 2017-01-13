@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using System.Collections;
 using System.Data;
 using BS.Common.Dao;
+using BS.Common.Utils;
+using System.Configuration;
 
 namespace BS.Common.Utils
 {
@@ -18,12 +20,13 @@ namespace BS.Common.Utils
     ///         Initial Version.
     ///     </change>
     /// </history>
-    public class QueryBuilder : IQueryBuilder
+    public class QueryBuilder : BaseQueryBuilder, IQueryBuilder
     {
         /// <summary>
-        /// 
         /// </summary>
         public static readonly string Param = "@p";
+        private string Certificate = ConfigurationManager.AppSettings["Certificate"];
+        private string EncryptionKey = ConfigurationManager.AppSettings["EncryptionKey"];
 
         /// <summary>
         /// Builds an SQL SELECT statement using the specified entity.
@@ -35,11 +38,7 @@ namespace BS.Common.Utils
         /// <returns>The SELECT statement</returns>
         public StringBuilder BuildQuery(Entity entity)
         {
-            if (entity == null || string.IsNullOrEmpty(entity.GetTableName()))
-            {
-                LoggerHelper.Warning("Entity is null or entity TableName is not specified.");
-                throw new ArgumentNullException("Entity is null or entity TableName is not specified.");
-            }
+            CheckNulls(entity);
 
             StringBuilder query = new StringBuilder();
             StringBuilder join = new StringBuilder();
@@ -54,6 +53,8 @@ namespace BS.Common.Utils
                 query.Append(join);
             }
 
+            WrapEncryptKey(entity,query);
+            
             return query;
         }
 
@@ -102,10 +103,12 @@ namespace BS.Common.Utils
                 query.Append(" WHERE RowNumber BETWEEN ");
                 query.Append(filter.Start + 1).Append(" AND ").Append(filter.Start + filter.Lenght);
             }
-
+            
+            WrapEncryptKey(entity, query);
+            
             return query;
         }
-
+        
         /// <summary>
         /// Creates an SQL SELECT statement using the specified entity and filter.
         /// The where section is created from the entity properties and the filter is used for the sort section.
@@ -117,11 +120,7 @@ namespace BS.Common.Utils
         /// <returns>The SELECT statement</returns>
         public StringBuilder BuildFindEntitiesQuery(Entity entity, FilterInfo filter, FilterInfo.SearchType searchType)
         {
-            if (entity == null || string.IsNullOrEmpty(entity.GetTableName()))
-            {
-                LoggerHelper.Warning("Entity is null or entity TableName is not specified.");
-                throw new ArgumentNullException("Entity is null or entity TableName is not specified.");
-            }
+            CheckNulls(entity);
 
             StringBuilder query = new StringBuilder();
             StringBuilder join = new StringBuilder();
@@ -140,6 +139,8 @@ namespace BS.Common.Utils
 
             AppendSort(query, filter, entity, aliases);
 
+            WrapEncryptKey(entity,query);
+            
             return query;
         }
 
@@ -215,6 +216,9 @@ namespace BS.Common.Utils
                         {
                             case Field.DBType.Date:
                                 query.Append("CONVERT(VARCHAR, ").Append(GetFieldName(field, aliases)).Append(", 101) AS ").Append(GetFieldName(field)).Append(",");
+                                break;                           
+                            case Field.DBType.Encrypt:
+                                AppendDecryptByKey(query, aliases, field);
                                 break;
                             default:
                                 query.Append(GetFieldName(field, aliases)).Append(",");
@@ -271,11 +275,7 @@ namespace BS.Common.Utils
         /// <returns>The INSERT statement</returns>
         public StringBuilder BuildInsertQuery(Entity entity)
         {
-            if (entity == null || string.IsNullOrEmpty(entity.GetTableName()))
-            {
-                LoggerHelper.Warning("Entity is null or entity TableName is not specified.");
-                throw new ArgumentNullException("Entity is null or entity TableName is not specified.");
-            }
+            CheckNulls(entity);
 
             StringBuilder query = new StringBuilder();
             StringBuilder fieldValues = new StringBuilder();
@@ -309,11 +309,7 @@ namespace BS.Common.Utils
         /// <returns>The UPDATE statement</returns>
         public StringBuilder BuildUpdateQuery(Entity entity)
         {
-            if (entity == null || string.IsNullOrEmpty(entity.GetTableName()))
-            {
-                LoggerHelper.Warning("Entity is null or entity TableName is not specified.");
-                throw new ArgumentNullException("Entity is null or entity TableName is not specified.");
-            }
+            CheckNulls(entity);
 
             StringBuilder query = new StringBuilder();
 
@@ -343,11 +339,7 @@ namespace BS.Common.Utils
         /// <returns>The UPDATE statement</returns>
         public StringBuilder BuildUpdateEntityQuery(Entity entity)
         {
-            if (entity == null || entity.GetFieldId() == null)
-            {
-                LoggerHelper.Error("Entity does not have an Id field defined.");
-                throw new ArgumentNullException("Entity is null or does not have an Id field defined.");
-            }
+            CheckNulls(entity);
 
             StringBuilder query = new StringBuilder();
             query.Append("UPDATE ").Append(GetTableName(entity)).Append(" SET ");
@@ -377,11 +369,7 @@ namespace BS.Common.Utils
         /// <returns>The DELETE statement</returns>
         public StringBuilder BuildDeleteQuery(Entity entity)
         {
-            if (entity == null || string.IsNullOrEmpty(entity.GetTableName()))
-            {
-                LoggerHelper.Warning("Entity is null or entity TableName is not specified.");
-                throw new ArgumentNullException("Entity is null or entity TableName is not specified.");
-            }
+            CheckNulls(entity);
 
             StringBuilder query = new StringBuilder();
             query.Append("DELETE FROM ").Append(GetTableName(entity)).Append(" WHERE ");
@@ -402,7 +390,7 @@ namespace BS.Common.Utils
             return BuildInsertQuery(instance, idField, null);
         }
 
-                /// <summary>
+        /// <summary>
         /// Builds an SQL INSERT statement using the specified instance.
         /// </summary>
         /// <param name="instance">An Object instance</param>
@@ -426,11 +414,7 @@ namespace BS.Common.Utils
         /// <returns>The INSERT statement</returns>
         public StringBuilder BuildInsertQuery(Object instance, string idField, IDictionary<string, string> defaultVals, bool outputId)
         {
-            if (instance == null)
-            {
-                LoggerHelper.Warning("An instance must be specified.");
-                throw new ArgumentNullException("An instance must be specified.");
-            }
+            CheckNulls(instance);
 
             StringBuilder query = new StringBuilder();
             StringBuilder fieldValues = new StringBuilder();
@@ -486,7 +470,7 @@ namespace BS.Common.Utils
         /// <returns>The UPDATE statement</returns>
         public StringBuilder BuildUpdateQuery(Object instance, string idField)
         {
-            return BuildUpdateQuery(instance, idField);
+            return BuildUpdateQuery(instance, idField, null);
         }
 
         /// <summary>
@@ -499,11 +483,7 @@ namespace BS.Common.Utils
         /// <returns>The UPDATE statement</returns>
         public StringBuilder BuildUpdateQuery(Object instance, string idField, IDictionary<string, string> defaultVals)
         {
-            if (instance == null)
-            {
-                LoggerHelper.Warning("An instance must be specified.");
-                throw new ArgumentNullException("An instance must be specified.");
-            }
+            CheckNulls(instance);
 
             Type type = instance.GetType();
             StringBuilder query = new StringBuilder();
@@ -529,6 +509,18 @@ namespace BS.Common.Utils
                         query.Append(prop.GetValue(instance, null)).Append("' ,");
                     }
                 }
+                else if (prop.PropertyType == typeof(int) || (prop.PropertyType == typeof(double) || prop.PropertyType == typeof(decimal)))
+                {
+                    if (prop.Name == idField)
+                    {
+                        idValue = prop.GetValue(instance, null).ToString();
+                    }
+                    else
+                    {
+                        query.Append(prop.Name).Append(" = ");
+                        query.Append(prop.GetValue(instance, null)).Append(" ,");
+                    }
+                }
             }
 
             query.Remove(query.Length - 1, 1);
@@ -538,13 +530,16 @@ namespace BS.Common.Utils
             return query;
         }
 
+        /// <summary>
+        /// Builds a DELETE statement using the specified instance.
+        /// </summary>
+        /// <param name="instance">The instance</param>
+        /// <param name="idField">The id field</param>
+        /// <returns>The DELETE statement</returns>
         public StringBuilder BuildDeleteQuery(Object instance, string idField)
         {
-            if (instance == null)
-            {
-                LoggerHelper.Warning("An instance must be specified.");
-                throw new ArgumentNullException("An instance must be specified.");
-            }
+            CheckNulls(instance);
+
             StringBuilder query = new StringBuilder();
             Type type = instance.GetType();
             PropertyInfo[] props = type.GetProperties();
@@ -565,16 +560,51 @@ namespace BS.Common.Utils
             return query;
         }
 
+        /// <summary>
+        /// Builds an INSERT statement using the specified entity.
+        /// </summary>
+        /// <param name="entity">The entity</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when entity is null, entity TableName is not specified.</exception>
+        /// <returns>The Statement Wrapper containing the INSERT statement and the statement parameters.</returns>
+
         public StatementWrapper BuildInsertStatement(Entity entity)
         {
-            if (entity == null || string.IsNullOrEmpty(entity.GetTableName()))
-            {
-                LoggerHelper.Warning("Entity is null or entity TableName is not specified.");
-                throw new ArgumentNullException("Entity is null or entity TableName is not specified.");
-            }
+            CheckNulls(entity);
 
             StringBuilder query = new StringBuilder();
             IList<DBParam> queryParams = new List<DBParam>();
+            
+            BuildInsertStatement(entity, query, queryParams);
+
+            return new StatementWrapper(query, queryParams);
+        }
+
+        /// <summary>
+        /// Builds an INSERT statement using the specified entity and append it to the provided StringBuilder 
+        /// as well as the statement parameters to the specified list.
+        /// </summary>
+        /// <param name="entity">The entity</param>
+        /// <param name="query">the stringbuilder</param>
+        /// <param name="queryParams">the statement param list</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when entity is null, entity TableName is not specified.</exception>
+        public void BuildInsertStatement(Entity entity, StringBuilder query, IList<DBParam> queryParams)
+        {
+            BuildInsertStatement(entity, query, queryParams, null);
+        }
+
+        /// <summary>
+        /// Builds an INSERT statement using the specified entity and append it to the provided StringBuilder 
+        /// as well as the statement parameters to the specified list.
+        /// 
+        /// If a field value is found in the defaultVals list it will be used instead of the entity value.
+        /// </summary>
+        /// <param name="entity">The entity</param>
+        /// <param name="query">the stringbuilder</param>
+        /// <param name="queryParams">the statement param list</param>
+        /// <param name="defaultVals">the defaultVals list</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when entity is null, entity TableName is not specified.</exception>
+        public void BuildInsertStatement(Entity entity, StringBuilder query, IList<DBParam> queryParams, IDictionary<string, string> defaultVals)
+        {            
             StringBuilder fieldValues = new StringBuilder();
 
             query.Append("INSERT INTO ").Append(GetTableName(entity)).Append("(");
@@ -587,6 +617,14 @@ namespace BS.Common.Utils
                     if ((BS.Common.Entities.Field.DBType.Date == field.DataType || BS.Common.Entities.Field.DBType.DateTime == field.DataType) && entity.GetProperty(field.Name).ToUpper().Contains("GETDATE"))
                     {
                         fieldValues.Append("GETDATE(),");
+                    }
+                    else if (defaultVals != null && defaultVals.ContainsKey(field.Name))
+                    {
+                        fieldValues.Append(defaultVals[field.Name]).Append(",");
+                    }
+                    else if (BS.Common.Entities.Field.DBType.Encrypt == field.DataType)
+                    {
+                        AppendEncryptByKey(entity, fieldValues, field);
                     }
                     else
                     {
@@ -603,21 +641,39 @@ namespace BS.Common.Utils
             query.Append(" VALUES(").Append(fieldValues).Append(") ");
 
             query.Append("SELECT SCOPE_IDENTITY()");
-
-            return new StatementWrapper(query, queryParams);
+            WrapEncryptKey(entity, query);
+            
         }
 
+        /// <summary>
+        /// Builds an UPDATE statement using the specified entity. 
+        /// </summary>
+        /// <param name="entity">The entity</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when instance is null</exception>
+        /// <returns>The Statement Wrapper containing the UPDATE statement and the statement parameters.</returns>
         public StatementWrapper BuildUpdateStatement(Entity entity)
         {
-            if (entity == null || string.IsNullOrEmpty(entity.GetTableName()))
-            {
-                LoggerHelper.Warning("Entity is null or entity TableName is not specified.");
-                throw new ArgumentNullException("Entity is null or entity TableName is not specified.");
-            }
+            CheckNulls(entity);
 
             StringBuilder query = new StringBuilder();
             IList<DBParam> queryParams = new List<DBParam>();
 
+            BuildUpdateStatement(entity, query, queryParams);
+
+            return new StatementWrapper(query, queryParams);
+        }
+
+        /// <summary>
+        /// Builds an UPDATE statement using the specified entity and append it to the provided StringBuilder 
+        /// as well as the statement parameters to the specified list.
+        /// </summary>
+        /// <param name="entity">The entity</param>
+        /// <param name="query">the stringbuilder</param>
+        /// <param name="queryParams">the statement param list</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when instance is null</exception>
+        /// <returns>The Statement Wrapper containing the UPDATE statement and the statement parameters.</returns>
+        public void BuildUpdateStatement(Entity entity, StringBuilder query, IList<DBParam> queryParams)
+        {
             query.Append("UPDATE ").Append(GetTableName(entity)).Append(" SET ");
             foreach (Field field in entity.GetFields())
             {
@@ -627,6 +683,10 @@ namespace BS.Common.Utils
                     if ((BS.Common.Entities.Field.DBType.Date == field.DataType || BS.Common.Entities.Field.DBType.DateTime == field.DataType) && entity.GetProperty(field.Name).ToUpper().Contains("GETDATE"))
                     {
                         query.Append("GETDATE(),");
+                    }
+                    else if (BS.Common.Entities.Field.DBType.Encrypt == field.DataType)
+                    {
+                        AppendEncryptByKey(entity, query, field);
                     }
                     else
                     {
@@ -640,20 +700,44 @@ namespace BS.Common.Utils
             query.Append(GetFieldName(entity.GetFieldId())).Append(" = ").Append(Param + queryParams.Count);
             queryParams.Add(new DBParam(queryParams, entity.GetEntityId(), entity.GetFieldId().GetDbType()));
 
-            return new StatementWrapper(query, queryParams);
+            WrapEncryptKey(entity,query);            
         }
 
+        /// <summary>
+        /// Builds an UPDATE statement using the specified entity properties. 
+        /// <para>The Field flag as the entitiy Id is used in the WHERE clause of the statement.</para>
+        /// <para>Fields flag as not updatable are not included in the statement.</para>
+        /// </summary>
+        /// <param name="entity">An Entity</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when entity is null, entity TableName is not specified.</exception>
+        /// <returns>The Statement Wrapper containing the UPDATE statement and the statement parameters.</returns>
         public StatementWrapper BuildUpdateEntityStatement(Entity entity)
         {
-            if (entity == null || entity.GetFieldId() == null)
-            {
-                LoggerHelper.Error("Entity does not have an Id field defined.");
-                throw new ArgumentNullException("Entity is null or does not have an Id field defined.");
-            }
+            CheckNulls(entity);
 
             StringBuilder query = new StringBuilder();
             IList<DBParam> queryParams = new List<DBParam>();
 
+            BuildUpdateEntityStatement(entity, query, queryParams);
+            
+            return new StatementWrapper(query, queryParams);
+        }
+
+        /// <summary>
+        /// Builds an UPDATE statement using the specified entity properties. 
+        /// <para>The Field flag as the entitiy Id is used in the WHERE clause of the statement.</para>
+        /// <para>Fields flag as not updatable are not included in the statement.</para>
+        /// 
+        /// The statement will be append it to the provided StringBuilder 
+        /// as well as the statement parameters to the specified list.
+        /// </summary>
+        /// <param name="entity">An Entity</param>
+        /// <param name="query">the stringbuilder</param>
+        /// <param name="queryParams">the statement param list</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when entity is null, entity TableName is not specified.</exception>
+        /// <returns>The Statement Wrapper containing the UPDATE statement and the statement parameters.</returns>
+        public void BuildUpdateEntityStatement(Entity entity, StringBuilder query, IList<DBParam> queryParams)
+        {
             query.Append("UPDATE ").Append(GetTableName(entity)).Append(" SET ");
             foreach (KeyValuePair<string, string> pair in entity.GetProperties())
             {
@@ -677,27 +761,170 @@ namespace BS.Common.Utils
             query.Append(" WHERE ");
             query.Append(GetFieldName(entity.GetFieldId())).Append(" = ").Append(Param + queryParams.Count);
             queryParams.Add(new DBParam(queryParams, entity.GetEntityId(), entity.GetFieldId().GetDbType()));
-
-            return new StatementWrapper(query, queryParams);
         }
 
-        public StatementWrapper BuildDeleteStatement(Entity entity)
+        /// <summary>
+        /// Builds an UPDATE statement using the specified entity properties. 
+        /// <para>The specified whereEntity is used to build the WHERE clause of the statement.</para>
+        /// <para>Fields flag as not updatable are not included in the statement.</para>
+        /// </summary>
+        /// <param name="entity">the entity</param>
+        /// <param name="whereEntity">the where entity</param>
+        /// <returns>The Statement Wrapper containing the UPDATE statement and the statement parameters.</returns>
+        public StatementWrapper BuildUpdateEntityStatement(Entity entity, Entity whereEntity)
         {
-            if (entity == null || string.IsNullOrEmpty(entity.GetTableName()))
-            {
-                LoggerHelper.Warning("Entity is null or entity TableName is not specified.");
-                throw new ArgumentNullException("Entity is null or entity TableName is not specified.");
-            }
+            CheckNulls(entity);
+            CheckNulls(whereEntity);
 
             StringBuilder query = new StringBuilder();
             IList<DBParam> queryParams = new List<DBParam>();
-            query.Append("DELETE FROM ").Append(GetTableName(entity)).Append(" WHERE ");
-            query.Append(GetFieldName(entity.GetFieldId())).Append(" = ").Append(Param + queryParams.Count);
-            queryParams.Add(new DBParam(queryParams, entity.GetEntityId(), entity.GetFieldId().GetDbType()));
+
+            BuildUpdateEntityStatement(entity, whereEntity, query, queryParams);
 
             return new StatementWrapper(query, queryParams);
         }
 
+        /// <summary>
+        /// Builds an UPDATE statement using the specified entity properties and append it to the specified query. 
+        /// <para>The specified whereEntity is used to build the WHERE clause of the statement.</para>
+        /// <para>Fields flag as not updatable are not included in the statement.</para>
+        /// </summary>
+        /// <param name="entity">the entity</param>
+        /// <param name="whereEntity">the where entity</param>
+        /// <param name="query">the stringbuilder</param>
+        /// <param name="queryParams">the statement param list</param>
+        public void BuildUpdateEntityStatement(Entity entity, Entity whereEntity, StringBuilder query, IList<DBParam> queryParams)
+        {
+            query.Append("UPDATE ").Append(GetTableName(entity)).Append(" SET ");
+            foreach (KeyValuePair<string, string> pair in entity.GetProperties())
+            {
+                Field field = entity.GetField(pair.Key);
+                if (!field.Id)
+                {
+                    query.Append(GetFieldName(field)).Append(" = ");
+                    if ((BS.Common.Entities.Field.DBType.Date == field.DataType || BS.Common.Entities.Field.DBType.DateTime == field.DataType) && entity.GetProperty(field.Name).ToUpper().Contains("GETDATE"))
+                    {
+                        query.Append("GETDATE(),");
+                    }
+                    else
+                    {
+                        query.Append(Param).Append(queryParams.Count).Append(",");
+                        queryParams.Add(new DBParam(queryParams, GetStmtFieldValue(entity, field), field.GetDbType()));
+                    }
+                }
+            }
+
+            query.Remove(query.Length - 1, 1);
+            query.Append(" WHERE ");
+
+            foreach (KeyValuePair<string, string> pair in whereEntity.GetProperties())
+            {
+                Field field = whereEntity.GetField(pair.Key);
+                if (!field.Id)
+                {
+                    query.Append(GetFieldName(field)).Append(" = ");
+                    if ((BS.Common.Entities.Field.DBType.Date == field.DataType || BS.Common.Entities.Field.DBType.DateTime == field.DataType) && whereEntity.GetProperty(field.Name).ToUpper().Contains("GETDATE"))
+                    {
+                        query.Append("GETDATE(),");
+                    }
+                    else
+                    {
+                        query.Append(Param).Append(queryParams.Count).Append(",");
+                        queryParams.Add(new DBParam(queryParams, GetStmtFieldValue(whereEntity, field), field.GetDbType()));
+                    }
+                }
+            }
+
+            query.Remove(query.Length - 1, 1);
+        }
+
+        /// <summary>
+        /// Builds a DELETE statement using the specified entity.
+        /// </summary>
+        /// <param name="entity">An Entity</param>
+        /// <returns>The Statement Wrapper containing the DELETE statement and the statement parameters.</returns>
+        public StatementWrapper BuildDeleteStatement(Entity entity)
+        {
+            CheckNulls(entity);
+
+            StringBuilder query = new StringBuilder();
+            IList<DBParam> queryParams = new List<DBParam>();
+
+            BuildDeleteStatement(entity, query, queryParams);
+
+            return new StatementWrapper(query, queryParams);
+        }
+
+        /// <summary>
+        /// Builds a DELETE statement using the specified entity.
+        /// 
+        /// The statement will be append it to the provided StringBuilder 
+        /// as well as the statement parameters to the specified list.
+        /// </summary>
+        /// <param name="entity">An Entity</param>
+        /// <param name="query">the StringBuilder</param>
+        /// <param name="queryParams">the statement param list</param>
+        public void BuildDeleteStatement(Entity entity, StringBuilder query, IList<DBParam> queryParams)
+        {
+            query.Append("DELETE FROM ").Append(GetTableName(entity)).Append(" WHERE ");
+            query.Append(GetFieldName(entity.GetFieldId())).Append(" = ").Append(Param + queryParams.Count);
+            queryParams.Add(new DBParam(queryParams, entity.GetEntityId(), entity.GetFieldId().GetDbType()));
+        }
+
+        /// <summary>
+        /// Builds a DELETE statement using the specified entity properties to construct the WHERE clause.
+        /// </summary>
+        /// <param name="entity">An Entity</param>
+        /// <returns>The Statement Wrapper containing the DELETE statement and the statement parameters.</returns>
+        public StatementWrapper BuildDeleteEntitiesStatement(Entity entity)
+        {
+            CheckNulls(entity);
+
+            StringBuilder query = new StringBuilder();
+            IList<DBParam> queryParams = new List<DBParam>();
+
+            BuildDeleteEntitiesStatement(entity, query, queryParams);
+
+            return new StatementWrapper(query, queryParams);
+        }
+
+        /// <summary>
+        /// Builds a DELETE statement using the specified entity properties to construct the WHERE clause.
+        /// 
+        /// The statement will be append it to the provided StringBuilder 
+        /// as well as the statement parameters to the specified list.
+        /// </summary>
+        /// <param name="entity">An Entity</param>
+        /// <param name="query">the StringBuilder</param>
+        /// <param name="queryParams">the statement param list</param>
+        public void BuildDeleteEntitiesStatement(Entity entity, StringBuilder query, IList<DBParam> queryParams)
+        {
+            query.Append("DELETE FROM ").Append(GetTableName(entity));
+
+            StringBuilder where = new StringBuilder();
+
+            foreach (KeyValuePair<string, string> pair in entity.GetProperties())
+            {
+                if (!string.IsNullOrEmpty(pair.Value))
+                {
+                    where.Append("[").Append(pair.Key).Append("]").Append(" = ").Append(QueryBuilder.Param).Append(queryParams.Count).Append(" AND ");
+                    queryParams.Add(new DBParam(queryParams, pair.Value, DbType.String, false));
+                }
+            }
+
+            if (where.Length > 0)
+            {
+                where.Remove(where.Length - 4, 4);
+                query.Append(" WHERE ").Append(where);
+            }
+        }
+
+        /// <summary>
+        /// Creates the filtered total query of the specified entity
+        /// </summary>
+        /// <param name="entity">The entity</param>
+        /// <param name="filter">The filter</param>
+        /// <returns>The Statement Wrapper containing the SELECT statement and the statement parameters.</returns>
         public StatementWrapper BuildFilteredTotalRecordsStatement(Entity entity, FilterInfo filter)
         {
             StringBuilder query = new StringBuilder();
@@ -718,6 +945,17 @@ namespace BS.Common.Utils
 
             return new StatementWrapper(query, queryParams);
         }
+
+        /// <summary>
+        /// Builds a SELECT statement using the specified entity and filter.
+        /// <para>If there is fields with a ForeignKey specified the resulting statement will have the specified JOIN clause to the ForeignKey.TableName</para>
+        /// <para>also the ForeignKey.JoinFields will be included in the SELECT if present.</para>
+        /// <para>The FilterInfo is used to build the WHERE clause of the statement as well as to narrow the results to the specified length.</para>
+        /// </summary>
+        /// <param name="entity">An Entity, that contains all the table data to build the statement</param>
+        /// <param name="filter">A FilterInfo, that contains the data to build the WHERE clause</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when entity is null, entity TableName is not specified.</exception>
+        /// <returns>The Statement Wrapper containing the SELECT statement and the statement parameters.</returns>
 
         public StatementWrapper BuildSelectStatement(Entity entity, FilterInfo filter)
         {
@@ -755,10 +993,21 @@ namespace BS.Common.Utils
                 query.Append(" WHERE RowNumber BETWEEN ");
                 query.Append(filter.Start + 1).Append(" AND ").Append(filter.Start + filter.Lenght);
             }
-
-            return new StatementWrapper(query, queryParams); ;
+            
+            WrapEncryptKey(entity,query);
+            
+            return new StatementWrapper(query, queryParams); 
         }
 
+        /// <summary>
+        /// Creates a SELECT statement using the specified entity and filter.
+        /// The where section is created from the entity properties and the filter is used for the sort section.
+        /// </summary>
+        /// <param name="entity">The entity</param>
+        /// <param name="filter">The filter info</param>
+        /// <param name="searchType">The search type</param>
+        /// <returns>The query</returns>
+        /// <returns>The Statement Wrapper containing the SELECT statement and the statement parameters.</returns>
         public StatementWrapper BuildFindEntitiesStatement(Entity entity, FilterInfo filter, FilterInfo.SearchType searchType)
         {
             if (entity == null || string.IsNullOrEmpty(entity.GetTableName()))
@@ -783,10 +1032,23 @@ namespace BS.Common.Utils
             AppendWhere(query, searchType, entity, aliases, queryParams);
             
             AppendSort(query, filter, entity, aliases);
-
+           
+            WrapEncryptKey(entity,query);
+            
             return new StatementWrapper(query, queryParams);
         }
 
+        /// <summary>
+        /// Builds a SELECT statement with the specified Aggregated Functions in the aggregatedInfo object.
+        /// 
+        /// And sets the fields of the specified Aggregated Entity
+        /// </summary>
+        /// <param name="entity">an Entity</param>
+        /// <param name="aggregateInfo">The aggregatedinfo object</param>
+        /// <param name="aggregateEntity">The aggregated entity</param>
+        /// <param name="filter">The filter info</param>
+        /// <param name="searchType">The search type</param>
+        /// <returns>The Statement Wrapper containing the SELECT statement and the statement parameters.</returns>
         public StatementWrapper BuildAggregateStatement(Entity entity, AggregateInfo aggregateInfo, Entity aggregateEntity, FilterInfo.SearchType searchType, FilterInfo filter)
         {
             if (entity == null || string.IsNullOrEmpty(entity.GetTableName()))
@@ -875,6 +1137,15 @@ namespace BS.Common.Utils
             return new StatementWrapper(query, queryParams);
         }
 
+        /// <summary>
+        /// Creates the where section of a SELECT statement from the specified entity and filter and appends the result to the specified query also adds the
+        /// statement parameters to the specified queryParams list.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <param name="filter">The join part of the query</param>
+        /// <param name="query">The query</param>
+        /// <param name="aliases">A dictionary of the query aliases</param>
+        /// <param name="queryParams">The query params list</param>
         public void BuildQueryWhereSection(Entity entity, FilterInfo filter, StringBuilder query, IDictionary<string, string> aliases, IList<DBParam> queryParams)
         {
             StringBuilder where = new StringBuilder();
@@ -896,6 +1167,10 @@ namespace BS.Common.Utils
                         {
                             fieldName = " CONVERT(VARCHAR," + fieldName + ", 101) ";
                         }
+                        else if (field.DataType == Field.DBType.Encrypt)
+                        {
+                            fieldName = " CONVERT(VARCHAR,, DecryptByKey(" + fieldName + ")) "; 
+                        }
                     }
 
                     AppendLikeField(orWhere, fieldName, filter.Search, "OR", queryParams);
@@ -905,11 +1180,14 @@ namespace BS.Common.Utils
                     string value = col.Search;
                     // the following logic is to support backward compatibility before calling AppendSearchCondition
                     if (col.SearchType == FilterInfo.ColumnSearchType.LIKE && value.IndexOf("_RANGE_") == -1 && !value.StartsWith("LIST_")) value = "LIKE_" + value;
-                    if (col.SearchType == FilterInfo.ColumnSearchType.NULL)
+                    else if (col.SearchType == FilterInfo.ColumnSearchType.NULL)
                     {
                         value = value == "NULL" ? "NULL" : "NOT_NULL";
                     }
-
+                    else if (field.DataType == Field.DBType.Encrypt)
+                    {
+                        fieldName = " CONVERT(VARCHAR, DecryptByKey(" + fieldName + ")) ";
+                    }
                     //TODO: validate if the field can be obtained inside AppendSearchCondition
                     AppendSearchCondition(andWhere, field, fieldName, value, "AND", aliases, queryParams);
                 }                
@@ -950,11 +1228,24 @@ namespace BS.Common.Utils
             while(char.IsWhiteSpace(b[b.Length - 1]));
         }
 
+        /// <summary>
+        /// Constructs a search condition from the specified field and append it to the specified WHERE clause.
+        /// </summary>
+        /// <param name="where">the WHERE clase</param>
+        /// <param name="field">The field</param>
+        /// <param name="fieldName">the name of the field</param>
+        /// <param name="value">the value of the field</param>
+        /// <param name="type">logical operator AND or OR</param>
+        /// <param name="aliases">the list of table aliases</param>
+        /// <param name="queryParams">the list of the statement params</param>
         public void AppendSearchCondition(StringBuilder where, Field field, string fieldName, string value, string type, IDictionary<string, string> aliases, IList<DBParam> queryParams)
         {
             if (field != null)
             {
-                fieldName = GetFieldName(field, aliases);
+                if (field.DataType != Field.DBType.Encrypt)
+                {
+                    fieldName = GetFieldName(field, aliases);
+                }
             }
 
             if (value.Equals("NOT_NULL")) //must be capital letters
@@ -974,7 +1265,7 @@ namespace BS.Common.Utils
                 
                 if (value.IndexOf("_RANGE_", StringComparison.InvariantCultureIgnoreCase) != -1)
                 {
-                    AppendRange(where, fieldName, value, queryParams, field);
+                    AppendRange(where, fieldName, value, queryParams, field, type);
                 }
                 else if (value.StartsWith("LIST_", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -991,6 +1282,14 @@ namespace BS.Common.Utils
             }
         }
 
+        /// <summary>
+        /// Constructs a WHERE clause from the specified entity and append it to the specified statement.
+        /// </summary>
+        /// <param name="query">the statement</param>
+        /// <param name="searchType">logical operator AND or OR</param>
+        /// <param name="entity">the entity</param>
+        /// <param name="aliases">the list of table aliases</param>
+        /// <param name="queryParams">the list of the statement params</param>
         public void AppendWhere(StringBuilder query, FilterInfo.SearchType searchType, Entity entity, IDictionary<string, string> aliases, IList<DBParam> queryParams)
         {
             StringBuilder where = new StringBuilder();
@@ -1017,6 +1316,17 @@ namespace BS.Common.Utils
             }
         }
 
+        /// <summary>
+        /// Creates a LIKE type predicate using the specified fieldname and value and append it to the specified WHERE clause.
+        /// <para>
+        /// If the queryParams is not null it will create a parameterized predicate 
+        /// </para>
+        /// </summary>
+        /// <param name="where">the WHERE clause</param>
+        /// <param name="fieldName">the name of the field</param>
+        /// <param name="value">the value of the field</param>
+        /// <param name="type">logical operator AND or OR</param>
+        /// <param name="queryParams">the list of the statement params</param>
         public void AppendLikeField(StringBuilder where, string fieldName, string value, string type, IList<DBParam> queryParams)
         {
             where.Append(" ").Append(fieldName).Append(" LIKE ");
@@ -1031,6 +1341,18 @@ namespace BS.Common.Utils
             }
         }
 
+        /// <summary>
+        /// Creates an EQUALS type predicate using the specified fieldname and value and append it to the specified WHERE clause.
+        /// <para>
+        /// If the queryParams is not null it will create a parameterized predicate 
+        /// </para>
+        /// </summary>
+        /// <param name="where">the WHERE clause</param>
+        /// <param name="fieldName">the name of the field</param>
+        /// <param name="value">the value of the field</param>
+        /// <param name="type">logical operator AND or OR</param>
+        /// <param name="queryParams">the list of the statement params</param>
+        /// <param name="field">the field</param>
         public void AppendField(StringBuilder where, string fieldName, string value, string type, IList<DBParam> queryParams, Field field)
         {
             where.Append(" ").Append(fieldName).Append(" = ");
@@ -1041,18 +1363,37 @@ namespace BS.Common.Utils
             else
             {
                 where.Append(Param + queryParams.Count).Append(" ");
-                queryParams.Add(new DBParam(queryParams, value, field.GetDbType()));
+                queryParams.Add(new DBParam(queryParams, value, field == null ? DbType.String : field.GetDbType()));
             }
             
             where.Append(type);
         }
 
+        /// <summary>
+        /// Creates an EQUALS type predicate using the specified fieldname and value and append it to the specified WHERE clause.
+        /// </summary>
+        /// <param name="where">the WHERE clause</param>
+        /// <param name="fieldName">the name of the field</param>
+        /// <param name="value">the value of the field</param>
+        /// <param name="type">logical operator AND or OR</param>
         public void AppendField(StringBuilder where, string fieldName, string value, string type)
         {
             AppendField(where, fieldName, value, type, null, null);
         }
 
-        public void AppendRange(StringBuilder query, string fieldName, string value, IList<DBParam> queryParams, Field field)
+        /// <summary>
+        /// Creates a RANGE type predicate using the specified fieldname and value and append it to the specified WHERE clause.
+        /// <para>
+        /// If the queryParams is not null it will create a parameterized predicate 
+        /// </para>
+        /// </summary>
+        /// <param name="query">the WHERE clause</param>
+        /// <param name="fieldName">the name of the field</param>
+        /// <param name="value">the value of the field</param>
+        /// <param name="queryParams">the list of the statement params</param>
+        /// <param name="field">the field</param>
+        /// <param name="type">logical operator AND or OR</param>
+        public void AppendRange(StringBuilder query, string fieldName, string value, IList<DBParam> queryParams, Field field,string type)
         {
             string[] rangeValues = splitIgnoreCase(value, "_RANGE_");
             query.Append(" (");
@@ -1082,16 +1423,36 @@ namespace BS.Common.Utils
                     queryParams.Add(new DBParam(queryParams, rangeValues[1], field.GetDbType()));
                 }
             }
-            query.Append(") AND ");
+            query.Append(") ").Append(type).Append(" ");
         }
 
-        public void AppendRange(StringBuilder query, string fieldName, string value)
+        /// <summary>
+        /// Creates a RANGE type predicate using the specified fieldname and value and append it to the specified WHERE clause.
+        /// </summary>
+        /// <param name="query">the WHERE clause</param>
+        /// <param name="fieldName">the name of the field</param>
+        /// <param name="value">the value of the field</param>
+        /// <param name="type">logical operator AND or OR</param>
+        public void AppendRange(StringBuilder query, string fieldName, string value, string type)
         {
-            AppendRange(query, fieldName, value, null, null);
+            AppendRange(query, fieldName, value, null, null, type);
         }
 
+        /// <summary>
+        /// Creates an IN type predicate using the specified fieldname and value and append it to the specified WHERE clause.
+        /// <para>
+        /// If the queryParams is not null it will create a parameterized predicate 
+        /// </para>
+        /// </summary>
+        /// <param name="where">the WHERE clause</param>
+        /// <param name="fieldName">the name of the field</param>
+        /// <param name="value">the value of the field</param>
+        /// <param name="type">logical operator AND or OR</param>
+        /// <param name="queryParams">the list of the statement params</param>
         public void AppendList(StringBuilder where, string fieldName, string value, string type, IList<DBParam> queryParams)
         {
+            where.Append(" ");
+
             value = replaceStringAtIndex(value, "LIST_").Replace("LIST_", "");
             if (queryParams == null)
             {
@@ -1112,11 +1473,25 @@ namespace BS.Common.Utils
             where.Append(") ").Append(type).Append(" ");
         }
 
+        /// <summary>
+        /// Creates an IN type predicate using the specified fieldname and value and append it to the specified WHERE clause.
+        /// </summary>
+        /// <param name="where">the WHERE clause</param>
+        /// <param name="fieldName">the name of the field</param>
+        /// <param name="value">the value of the field</param>
+        /// <param name="type">logical operator AND or OR</param>
         public void AppendList(StringBuilder where, string fieldName, string value, string type)
         {
             AppendList(where, fieldName, value, type, null);            
         }
 
+        /// <summary>
+        /// Creates the ORDER BY clause and append it to the specified statement.
+        /// </summary>
+        /// <param name="query">the statement</param>
+        /// <param name="filter">the filter info instance</param>
+        /// <param name="entity">the entity</param>
+        /// <param name="aliases">the list of table aliases</param>
         public void AppendSort(StringBuilder query, FilterInfo filter, Entity entity, IDictionary<string, string> aliases)
         {
             if (filter != null && filter.SortColumns.Count > 0)
@@ -1296,10 +1671,77 @@ namespace BS.Common.Utils
 
             return value;
         }
-    
 
+        /// <summary>
+        /// Returns the table name from the specified entity,
+        /// </summary>
+        /// <param name="entity">the entity</param>
+        /// <returns>the table name</returns>
         public string GetTableName(Entity entity) {
             return "[" + entity.GetTableName().Replace("[", "").Replace("]", "").Replace(".", "].[") + "]";
+        }
+
+        /// <summary>
+        /// wraps the specified field with the Encrypt function and append it to the specified statement
+        /// </summary>
+        /// <param name="entity">the entity</param>
+        /// <param name="query">the statement</param>
+        /// <param name="field">the field</param>
+        public void AppendEncryptByKey(Entity entity, StringBuilder query, Field field)
+        {
+            if (!String.IsNullOrEmpty(this.Certificate) && !String.IsNullOrEmpty(this.EncryptionKey))
+            {
+                query.Append("EncryptByKey (Key_GUID('").Append(this.EncryptionKey).Append("'),CONVERT(varchar,'").Append(GetStmtFieldValue(entity, field)).Append("')),");
+            }
+            else
+            {
+                throw new Exception("EncryptionKey or Certificate NOT found. Cannot save encrypted field");
+            }
+        }
+
+        /// <summary>
+        /// wraps the specified field with the Decrypt function and append it to the specified statement
+        /// </summary>
+        /// <param name="query">the statement</param>
+        /// <param name="aliases">the list of tables aliases</param>
+        /// <param name="field">the field to be wrap</param>
+        public void AppendDecryptByKey(StringBuilder query, IDictionary<string, string> aliases, Field field)
+        {
+            if (!String.IsNullOrEmpty(this.Certificate) && !String.IsNullOrEmpty(this.EncryptionKey))
+            {
+                query.Append("CONVERT(VARCHAR(100),DecryptByKey( ").Append(GetFieldName(field, aliases)).Append(")) AS ").Append(GetFieldName(field)).Append(",");
+            }
+            else
+            {   //instead of throwing exception return field with message
+                query.Append(" 'Unable To Decrypt Field' AS").Append(GetFieldName(field)).Append(",");
+            }
+        }
+
+        /// <summary>
+        /// Adds  Open and Close Symetric key statements to SQL select, update or insert
+        /// </summary>
+        /// <param name="entity">the entity</param>
+        /// <param name="query"> the query of stringbuilder type passed by reference for appending </param>
+        public void WrapEncryptKey(Entity entity, StringBuilder query)
+        {
+            //Check if entity actually have a field of type encryption that is updtabale and/or insertable
+            bool containEncryptField = entity.GetFields().Exists(x => x.DataType == Field.DBType.Encrypt && (x.Insertable || x.Updatable));
+
+            if (containEncryptField && (query.ToString().ToLower().Contains("cryptbykey")))
+            {
+                if (!String.IsNullOrEmpty(this.Certificate) && !String.IsNullOrEmpty(this.EncryptionKey))
+                {
+                    StringBuilder hdr = new StringBuilder();
+                    hdr.Append("OPEN SYMMETRIC KEY ").Append(this.EncryptionKey).Append(" DECRYPTION BY CERTIFICATE ").Append(this.Certificate).Append(";  ");
+                    query.Insert(0, hdr);
+                    query.Append(" CLOSE SYMMETRIC KEY ").Append(this.EncryptionKey);
+                }
+                else
+                {
+                    //just log the error not throw exception at this point);
+                    LoggerHelper.Warning("EncryptionKey or Certificate NOT found but there are fields with internal encrypt datatype");
+                }
+            }
         }
     }
 }

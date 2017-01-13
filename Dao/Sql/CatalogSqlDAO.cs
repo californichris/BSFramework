@@ -305,7 +305,37 @@ namespace BS.Common.Dao.Sql
         }
 
         /// <summary>
-        /// Deletes all entities that match the specified entity properties from an SQL database.
+        /// Updates all entities that math the specified whereEntity properties in a SQL database.
+        /// </summary>
+        /// <param name="entity">The entity that contains the properties that will be updated.</param>
+        /// <param name="whereEntity">The entity that contains the properties used in the WHERE clause.</param>
+        public virtual void UpdateEntity(Entity entity, Entity whereEntity)
+        {
+            LoggerHelper.Info("Start");
+            try
+            {
+                if (whereEntity == null)
+                {
+                    UpdateEntity(entity);
+                    return;
+                }
+
+                StatementWrapper stmtWrapper = ((QueryBuilder) GetQueryBuilder()).BuildUpdateEntityStatement(entity, whereEntity);
+                LoggerHelper.Debug(stmtWrapper.Query.ToString());
+                GetQueryRunner().ExecuteNonQuery(GetConnection(), stmtWrapper);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Unable to update " + entity.GetTableName() + ".", e);
+            }
+            finally
+            {
+                LoggerHelper.Info("End");
+            }
+        }
+
+        /// <summary>
+        /// Deletes all entities that match the specified entity properties from a SQL database.
         /// </summary>
         /// <param name="entity">The entity that contains the properties.</param>
         public virtual void DeleteEntities(Entity entity)
@@ -313,7 +343,7 @@ namespace BS.Common.Dao.Sql
             LoggerHelper.Info("Start");
             try
             {
-                GetQueryRunner().ExecuteNonQuery(GetConnection(), BuildDeleteEntitiesStatement(entity));
+                GetQueryRunner().ExecuteNonQuery(GetConnection(), GetQueryBuilder().BuildDeleteEntitiesStatement(entity));
             }
             catch (Exception e)
             {
@@ -332,41 +362,82 @@ namespace BS.Common.Dao.Sql
             }
         }
 
+        /// <summary>
+        /// Executes a transaction in a SQL database.
+        /// </summary>
+        /// <param name="operations">The list of operations to be executed.</param>
         public virtual void ExecuteTransaction(List<TransOperation> operations)
         {
             LoggerHelper.Info("Start");
             try
             {
-                IList<StatementWrapper> statements = new List<StatementWrapper>();
+                StringBuilder query = new StringBuilder();
+                IList<DBParam> queryParams = new List<DBParam>();
+                
+                StringBuilder variables = new StringBuilder();
+                StringBuilder statementsQueries = new StringBuilder();
+                
+                IDictionary<string, string> defaultVals = new Dictionary<string, string>();                
+                
+                IQueryBuilder queryBuilder = GetQueryBuilder();
+                
                 foreach (TransOperation operation in operations)
                 {
-                    StatementWrapper stmtWrapper = null;
+                    Entity entity = operation.Entity;
                     if (operation.OperationType == TransOperation.OperType.Save)
                     {
                         if (string.IsNullOrEmpty(operation.Entity.GetEntityId())) // New entity Insert
                         {
-                            stmtWrapper = GetQueryBuilder().BuildInsertStatement(operation.Entity); 
+                            if (operation.BindIds)
+                            {
+                                queryBuilder.BuildInsertStatement(entity, statementsQueries, queryParams, defaultVals);
+                            }
+                            else
+                            {
+                                queryBuilder.BuildInsertStatement(entity, statementsQueries, queryParams);
+                            }
+                            
+                            Field id = entity.GetFieldId();
+                            string varName = GetVariableName(id);
+
+                            if (!defaultVals.ContainsKey(id.Name))
+                            {
+                                defaultVals[id.Name] = varName;
+                                variables.Append("DECLARE ").Append(varName).Append(" AS INT\n");
+                            }
+
+                            statementsQueries.Append("\nSET ").Append(varName).Append(" = scope_identity()\n");
                         }
                         else //update
                         {
-                            stmtWrapper = GetQueryBuilder().BuildUpdateStatement(operation.Entity); 
-                        }  
-                    } else if(operation.OperationType == TransOperation.OperType.Update) {
-                        stmtWrapper = GetQueryBuilder().BuildUpdateEntityStatement(operation.Entity); 
+                            queryBuilder.BuildUpdateStatement(entity, statementsQueries, queryParams);
+                        }
+                    }
+                    else if (operation.OperationType == TransOperation.OperType.Update)
+                    {
+                        queryBuilder.BuildUpdateEntityStatement(entity, statementsQueries, queryParams);
                     }
                     else if (operation.OperationType == TransOperation.OperType.Delete)
                     {
-                        stmtWrapper = GetQueryBuilder().BuildDeleteStatement(operation.Entity); 
+                        queryBuilder.BuildDeleteStatement(entity, statementsQueries, queryParams);
                     }
                     else if (operation.OperationType == TransOperation.OperType.DeleteEntities)
                     {
-                        stmtWrapper = BuildDeleteEntitiesStatement(operation.Entity);
+                        queryBuilder.BuildDeleteEntitiesStatement(entity, statementsQueries, queryParams);
                     }
 
-                    LoggerHelper.Debug(stmtWrapper.Query.ToString());
-                    statements.Add(stmtWrapper);
+                    statementsQueries.Append("\n");
                 }
-               
+
+                query.Append(variables).Append("\n");
+                query.Append(statementsQueries);
+                LoggerHelper.Debug(query.ToString());
+
+                StatementWrapper stmtWrapper = new StatementWrapper(query, queryParams);
+
+                IList<StatementWrapper> statements = new List<StatementWrapper>();
+                statements.Add(stmtWrapper);
+
                 GetQueryRunner().ExecuteTransaction(GetConnection(), statements);
             }
             catch (Exception e)
@@ -383,8 +454,6 @@ namespace BS.Common.Dao.Sql
                 {
                     throw new Exception("Unable to execute transactions.", e);
                 }
-
-                
             }
             finally
             {
@@ -392,44 +461,31 @@ namespace BS.Common.Dao.Sql
             }
         }
 
-        private StatementWrapper BuildDeleteEntitiesStatement(Entity entity)
+        private string GetVariableName(Field field)
         {
-            if (entity == null || string.IsNullOrEmpty(entity.GetTableName()))
-            {
-                LoggerHelper.Warning("Entity is null or entity TableName is not specified.");
-                throw new ArgumentNullException("Entity is null or entity TableName is not specified.");
-            }
-
-            StringBuilder query = new StringBuilder();
-            query.Append("DELETE FROM ").Append(GetQueryBuilder().GetTableName(entity));
-
-            StringBuilder where = new StringBuilder();
-            IList<DBParam> queryParams = new List<DBParam>();
-
-            foreach (KeyValuePair<string, string> pair in entity.GetProperties())
-            {
-                if (!string.IsNullOrEmpty(pair.Value))
-                {
-                    where.Append("[").Append(pair.Key).Append("]").Append(" = ").Append(QueryBuilder.Param).Append(queryParams.Count).Append(" AND ");
-                    queryParams.Add(new DBParam(queryParams, pair.Value, DbType.String, false));
-                }
-            }
-
-            if (where.Length > 0)
-            {
-                where.Remove(where.Length - 4, 4);
-                query.Append(" WHERE ").Append(where);
-            }
-
-            LoggerHelper.Debug(query.ToString());
-            return new StatementWrapper(query, queryParams);
+            return "@" + field.Name.ToUpper();
         }
 
+        /// <summary>
+        /// Returns the result of the specified aggregated function(s) executed in a SQL Database.
+        /// </summary>
+        /// <param name="entity">The entity type</param>
+        /// <param name="aggregateInfo">The aggregateInfo data</param>
+        /// <param name="searchType">The search type</param>
+        /// <returns>The agregated list of entities</returns>
         public IList<Entity> GetAggregateEntities(Entity entity, AggregateInfo aggregateInfo, FilterInfo.SearchType searchType)
         {
             return GetAggregateEntities(entity, aggregateInfo, searchType, null);
         }
 
+        /// <summary>
+        /// Returns the result of the specified aggregated function(s) executed in a SQL Database.
+        /// </summary>
+        /// <param name="entity">The entity type</param>
+        /// <param name="aggregateInfo">The aggregateInfo data</param>
+        /// <param name="searchType">The search type</param>
+        /// <param name="filter">The filter info</param>
+        /// <returns>The agregated list of entities</returns>
         public IList<Entity> GetAggregateEntities(Entity entity, AggregateInfo aggregateInfo, FilterInfo.SearchType searchType, FilterInfo filter)
         {
             LoggerHelper.Info("Start");
