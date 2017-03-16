@@ -213,7 +213,30 @@ namespace BS.Common.Dao.Cache
             }
         }
 
+        public virtual void UpdateEntity(Entity entity, Entity whereEntity)
+        {
+            LoggerHelper.Info("Start");
+            try
+            {
+                if (whereEntity == null)
+                {
+                    UpdateEntity(entity);
+                    return;
+                }
 
+                StatementWrapper stmtWrapper = ((QueryBuilder)GetQueryBuilder()).BuildUpdateEntityStatement(entity, whereEntity);
+                LoggerHelper.Debug(stmtWrapper.Query.ToString());
+                GetQueryRunner().ExecuteNonQuery(GetConnection(), stmtWrapper);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Unable to update " + entity.GetTableName() + ".", e);
+            }
+            finally
+            {
+                LoggerHelper.Info("End");
+            }
+        }
         public void DeleteEntities(Entity entity)
         {
             sqlDAO.DeleteEntities(entity);

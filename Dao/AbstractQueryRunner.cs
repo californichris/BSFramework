@@ -1,5 +1,5 @@
-﻿using BS.Common.Utils;
-using System.Data.Common;
+﻿using System.Data.Common;
+using BS.Common.Utils;
 
 namespace BS.Common.Dao
 {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using BS.Common.Entities.Page;
 using BS.Common.Entities;
+using BS.Common.Entities.Page;
 
 namespace BS.Common.Dao
 {
@@ -57,6 +57,9 @@ namespace BS.Common.Dao
         /// <returns>The list of columns</returns>
         IList<Entity> GetTableColumns(string tableName);
 
+        /// <summary>
+        /// Refresh the page cache.
+        /// </summary>
         void RefreshCache();
     }
 }

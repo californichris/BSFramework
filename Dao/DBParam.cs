@@ -31,6 +31,11 @@ namespace BS.Common.Dao
         public bool IsLike { get; set; }
 
         /// <summary>
+        /// Flag signaling the direction of the param input-only, output-only, bidirectional.
+        /// </summary>
+        public ParameterDirection Direction { get; set; }
+
+        /// <summary>
         /// Creates a DBParam instance.
         /// </summary>
         public DBParam() { }
@@ -75,6 +80,13 @@ namespace BS.Common.Dao
         public DBParam(string paramName, object paramValue) : this(paramName, paramValue, DbType.String) { }
 
         /// <summary>
+        /// Creates a DBParam instance and sets the ParamName and direction properties
+        /// </summary>
+        /// <param name="paramNam">The parameter name</param>
+        /// <param name="direction">The parameter direction</param>
+        public DBParam(string paramNam, ParameterDirection direction) : this(paramNam, "", DbType.Decimal, false, direction) { }
+
+        /// <summary>
         /// Creates a DBParam instance and sets the ParamName, ParamValue and ParamType properties
         /// </summary>
         /// <param name="paramName">The parameter name</param>
@@ -89,7 +101,17 @@ namespace BS.Common.Dao
         /// <param name="paramValue">The parameter value</param>
         /// <param name="paramType">The parameter type</param>
         /// <param name="isLike">The isLike flag</param>
-        public DBParam(string paramName, object paramValue, DbType paramType, bool isLike)
+        public DBParam(string paramName, object paramValue, DbType paramType, bool isLike) : this(paramName, paramValue, paramType, isLike, ParameterDirection.Input) { }
+
+        /// <summary>
+        /// Creates a DBParam instance and sets the ParamName, ParamValue, IsLike, ParamType and direction properties
+        /// </summary>
+        /// <param name="paramName">The parameter name</param>
+        /// <param name="paramValue">The parameter value</param>
+        /// <param name="paramType">The parameter type</param>
+        /// <param name="isLike">The isLike flag</param>
+        /// <param name="direction">The parameter direction</param>
+        public DBParam(string paramName, object paramValue, DbType paramType, bool isLike, ParameterDirection direction)
         {
             this.ParamName = paramName;
 
@@ -124,6 +146,7 @@ namespace BS.Common.Dao
 
             this.ParamType = paramType;
             this.IsLike = isLike;
+            this.Direction = direction;
         }
 
     }

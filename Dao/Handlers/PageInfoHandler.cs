@@ -1,6 +1,6 @@
 ﻿using System;
-using BS.Common.Entities.Page;
 using System.Data.Common;
+using BS.Common.Entities.Page;
 
 namespace BS.Common.Dao.Handlers
 {

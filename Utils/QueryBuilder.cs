@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using BS.Common.Entities;
-using System;
-using System.Reflection;
-using System.Text.RegularExpressions;
+﻿using System;
 using System.Collections;
-using System.Data;
-using BS.Common.Dao;
-using BS.Common.Utils;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
+using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
+using BS.Common.Dao;
+using BS.Common.Entities;
 
 namespace BS.Common.Utils
 {
@@ -1169,7 +1168,7 @@ namespace BS.Common.Utils
                         }
                         else if (field.DataType == Field.DBType.Encrypt)
                         {
-                            fieldName = " CONVERT(VARCHAR,, DecryptByKey(" + fieldName + ")) "; 
+                            fieldName = " CONVERT(VARCHAR, DecryptByKey(" + fieldName + ")) "; 
                         }
                     }
 
@@ -1184,7 +1183,8 @@ namespace BS.Common.Utils
                     {
                         value = value == "NULL" ? "NULL" : "NOT_NULL";
                     }
-                    else if (field.DataType == Field.DBType.Encrypt)
+                    
+                    if (field.DataType == Field.DBType.Encrypt)
                     {
                         fieldName = " CONVERT(VARCHAR, DecryptByKey(" + fieldName + ")) ";
                     }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using BS.Common.Dao.Sql;
 using System.Runtime.Caching;
+using BS.Common.Dao.Sql;
 using BS.Common.Entities;
 using BS.Common.Entities.Page;
 using BS.Common.Utils;
@@ -155,6 +155,9 @@ namespace BS.Common.Dao.Cache
             return sqlDAO.GetTableColumns(tableName);
         }
 
+        /// <summary>
+        /// Refresh the page cache.
+        /// </summary>
         public void RefreshCache()
         {
             ObjectCache cache = MemoryCache.Default;

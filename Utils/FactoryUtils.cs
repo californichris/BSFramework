@@ -1,7 +1,7 @@
 ﻿using System;
-using BS.Common.Dao;
-using System.Reflection;
 using System.Configuration;
+using System.Reflection;
+using BS.Common.Dao;
 
 namespace BS.Common.Utils
 {

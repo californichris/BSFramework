@@ -6,16 +6,14 @@ using System.Web.Script.Serialization;
 using BS.Common.Entities;
 using BS.Common.Entities.Page;
 using BS.Common.Dao;
-using System.Text;
 using System.Configuration;
-using BS.Common.Dao.Sql;
 
 namespace BS.Common.Ajax
 {
     /// <summary>
     /// Ajax handlre for al Page related operations
     /// </summary>
-    public class PageInfo : AjaxBase
+    public class PageInfo : PageInfoBase
     {
         /// <summary>
         /// Page Id request parameter name
@@ -38,19 +36,16 @@ namespace BS.Common.Ajax
         public static readonly string AggregateParam = "aggregateInfo";
 
         /// <summary>
+        /// Where Entity request parameter name
+        /// </summary>
+        public static readonly string WhereEntityParam = "whereEntity";
+
+
+        /// <summary>
         /// Creates an Instance of the PageInfo Ajax class
         /// </summary>
         public PageInfo()
         {
-        }
-
-        /// <summary>
-        /// Returns the PageInfo data source
-        /// </summary>
-        /// <returns>The Page data source</returns>
-        protected virtual IPageInfoDAO GetPageInfoDAO()
-        {
-            return (IPageInfoDAO) FactoryUtils.GetDAO(ConfigurationManager.AppSettings["IPageInfoDAO"]);
         }
 
         /// <summary>
@@ -59,7 +54,30 @@ namespace BS.Common.Ajax
         /// <returns>The Catalog data source</returns>
         protected virtual ICatalogDAO GetCatalogDAO()
         {
-            return (ICatalogDAO) FactoryUtils.GetDAO(ConfigurationManager.AppSettings["ICatalogDAO"]);
+            return GetCatalogDAO("");
+        }
+
+        /// <summary>
+        /// Returns the Catalog data source, with the proper query QueryBuilder depending on the specified page.connName
+        /// </summary>
+        /// <param name="page">The page</param>
+        /// <returns>The Catalog data source</returns>
+        protected virtual ICatalogDAO GetCatalogDAO(Page page)
+        {
+            return GetCatalogDAO(page.ConnName);
+        }
+
+        /// <summary>
+        /// Returns the Catalog data source, with the proper query QueryBuilder depending on the specified connName
+        /// </summary>
+        /// <param name="connName">The connection name string</param>
+        /// <returns>The Catalog data source</returns>
+        protected virtual ICatalogDAO GetCatalogDAO(string connName)
+        {
+            BaseSqlDAO dao = (BaseSqlDAO)FactoryUtils.GetDAO(ConfigurationManager.AppSettings["ICatalogDAO"], connName);
+            dao.SetQueryBuilder(DbUtils.GetQueryBuilder(connName));
+
+            return (ICatalogDAO)dao;
         }
 
         #region Entity related methods
@@ -105,7 +123,12 @@ namespace BS.Common.Ajax
             }
         }
 
-
+        /// <summary>
+        /// Gets the list of entities from the datasource using the specified filter.
+        /// </summary>
+        /// <param name="request">the request</param>
+        /// <param name="filterInfo">the filter info</param>
+        /// <returns>the list of entities</returns>
         protected virtual IList<Entity> GetEntityList(HttpRequest request, FilterInfo filterInfo)
         {
             LoggerHelper.Info("Start");
@@ -120,22 +143,22 @@ namespace BS.Common.Ajax
                 {
                     if (filterInfo == null)
                     {
-                        list = GetCatalogDAO().GetEntities(entity);
+                        list = GetCatalogDAO(page).GetEntities(entity);
                     }
                     else
                     {
-                        list = GetCatalogDAO().GetEntities(entity, filterInfo);
+                        list = GetCatalogDAO(page).GetEntities(entity, filterInfo);
                     }
                 }
                 else
                 {
                     if (filterInfo == null)
                     {
-                        list = GetCatalogDAO().FindEntities(entity, GetSearchType(request));
+                        list = GetCatalogDAO(page).FindEntities(entity, GetSearchType(request));
                     }
                     else
                     {
-                        list = GetCatalogDAO().FindEntities(entity, filterInfo, GetSearchType(request));
+                        list = GetCatalogDAO(page).FindEntities(entity, filterInfo, GetSearchType(request));
                     }
                 }
             }            
@@ -146,29 +169,6 @@ namespace BS.Common.Ajax
 
             return list;
         }
-
-        protected virtual FilterInfo CreateFilter(HttpRequest request)
-        {
-            FilterInfo filterInfo = null;
-            if (FilterInfo.ContainsFilterInfo(request))
-            {
-                //Paging will be performed on server side
-                if (request.Params["filterInfo"] != null)
-                {
-                    string json = request.Params["filterInfo"];
-                    JavaScriptSerializer ser = new JavaScriptSerializer();
-                    ser.RegisterConverters(new JavaScriptConverter[] { new FilterInfoConverter() });
-                    filterInfo = ser.Deserialize<FilterInfo>(json);
-                }
-                else
-                {
-                    filterInfo = new FilterInfo(request);
-                }
-            }
-
-            return filterInfo;
-        }
-
 
         /// <summary>
         /// Saves the specified entity.
@@ -184,7 +184,7 @@ namespace BS.Common.Ajax
             {
                 Page page = GetPage(request);
                 entity = CreateEntity(request, page);
-                GetCatalogDAO().SaveEntity(entity);
+                GetCatalogDAO(page).SaveEntity(entity);
             }
             catch (Exception e)
             {
@@ -214,7 +214,18 @@ namespace BS.Common.Ajax
                 Page page = GetPage(request);
                 entity = CreateEntity(request, page);
 
-                GetCatalogDAO().UpdateEntity(entity);
+                Entity whereEntity = null;
+                string json = request.Params[PageInfo.WhereEntityParam];
+                LoggerHelper.Debug("whereEntity = " + json);
+
+                if (!string.IsNullOrEmpty(json))
+                {
+                    whereEntity = EntityUtils.CreateEntity(page, false);
+                    Dictionary<string, string> props = new JavaScriptSerializer().Deserialize<Dictionary<string, string>>(json);
+                    whereEntity.SetProperties(props);
+                }
+
+                GetCatalogDAO(page).UpdateEntity(entity, whereEntity);
             }
             catch (Exception e)
             {
@@ -244,7 +255,7 @@ namespace BS.Common.Ajax
                 Page page = GetPage(request);
                 entity = CreateEntity(request, page);
 
-                GetCatalogDAO().UpdateDeleteEntity(entity);
+                GetCatalogDAO(page).UpdateDeleteEntity(entity);
             }
             catch (Exception e)
             {
@@ -272,8 +283,8 @@ namespace BS.Common.Ajax
             {
                 Page page = GetPage(request);
                 Entity entity = CreateEntity(request, page);
-                
-                GetCatalogDAO().DeleteEntity(entity);
+
+                GetCatalogDAO(page).DeleteEntity(entity);
             }
             catch (Exception e)
             {
@@ -302,7 +313,7 @@ namespace BS.Common.Ajax
                 Page page = GetPage(request);
                 Entity entity = CreateEntity(request, page);
 
-                GetCatalogDAO().DeleteEntities(entity);
+                GetCatalogDAO(page).DeleteEntities(entity);
             }
             catch (Exception e)
             {
@@ -317,6 +328,11 @@ namespace BS.Common.Ajax
             return SuccessResponse();
         }
 
+        /// <summary>
+        /// Execute a transaction of all operations specified in the entities param.
+        /// </summary>
+        /// <param name="request">The request</param>
+        /// <returns>a JSON response</returns>
         public virtual string ExecuteTransaction(HttpRequest request)
         {
             LoggerHelper.Info("Start");
@@ -328,10 +344,18 @@ namespace BS.Common.Ajax
                 if (!String.IsNullOrEmpty(json))
                 {
                     entities = new JavaScriptSerializer().Deserialize<List<Dictionary<string, string>>>(json);
+                    if (entities.Count <= 0)
+                    {
+                        throw new ArgumentNullException("No entities found in request.");
+                    }
+                    
                     List<TransOperation> operations = new List<TransOperation>();
 
-                    foreach (Dictionary<string, string> props in entities)
+                    string connName = "";
+                    for (int i = 0; i < entities.Count; i++)
                     {
+                        Dictionary<string, string> props = entities[i];
+
                         Entity entity = new Entity();
                         entity.SetProperties(props);
                         string pageName = entity.GetProperty("PageName");
@@ -356,9 +380,23 @@ namespace BS.Common.Ajax
 
                         TransOperation operation = new TransOperation(operType, entity);
                         operations.Add(operation);
+                        
+                        //validate if all entities use the same connection name
+                        if (i == 0) //First entity
+                        {
+                            connName = page.ConnName == "DBConnString" ? "" : page.ConnName;
+                        }
+                        else
+                        {
+                            string _connName = page.ConnName == "DBConnString" ? "" : page.ConnName;
+                            if (connName != _connName)
+                            {
+                                throw new ArgumentNullException("All Entities must use the same connection name.");
+                            }
+                        }
                     }
 
-                    GetCatalogDAO().ExecuteTransaction(operations);
+                    GetCatalogDAO(connName).ExecuteTransaction(operations);
                 }
                 else
                 {
@@ -380,6 +418,11 @@ namespace BS.Common.Ajax
             return SuccessResponse();
         }
 
+        /// <summary>
+        /// Executes an aggregated operation in the datasource and returns the list of entities as a JSON response.
+        /// </summary>
+        /// <param name="request">The request</param>
+        /// <returns>a JSON response</returns>
         public virtual string GetAggreateEntities(HttpRequest request)
         {
             LoggerHelper.Info("Start");
@@ -396,7 +439,7 @@ namespace BS.Common.Ajax
                 string json = request.Params[AggregateParam];
                 LoggerHelper.Debug("AggregateInfo = " + json);
                 AggregateInfo aggregateInfo = (AggregateInfo) new JavaScriptSerializer().Deserialize(json, typeof(AggregateInfo));
-                list = GetCatalogDAO().GetAggregateEntities(entity, aggregateInfo, GetSearchType(request), CreateFilter(request));
+                list = GetCatalogDAO(page).GetAggregateEntities(entity, aggregateInfo, GetSearchType(request), CreateFilter(request));
             }
             catch (Exception e)
             {
@@ -483,14 +526,12 @@ namespace BS.Common.Ajax
             Page page = new Page();
             try
             {
+                if (!CheckPermissions()) return ErrorResponse("User don't have permissions to use this functionality.");
                 string json = request.Params[EntityParam];
                 LoggerHelper.Debug("entity = " + json);
                 page = (Page) new JavaScriptSerializer().Deserialize(json, typeof(Page));
                 page.UpdatedBy = GetCurrentUserName();
                 GetPageInfoDAO().SavePage(page);
-
-                //PageSqlDAO dao = new PageSqlDAO("ServiceDB");
-                //dao.SavePage("CMSLite", page);
             }
             catch (Exception e)
             {
@@ -516,6 +557,7 @@ namespace BS.Common.Ajax
             LoggerHelper.Info("Start");
             try
             {
+                if (!CheckPermissions()) return ErrorResponse("User don't have permissions to use this functionality.");
                 string json = request.Params[EntityParam];
                 LoggerHelper.Debug("entity = " + json);
                 Page page = (Page) new JavaScriptSerializer().Deserialize(json, typeof(Page));
@@ -536,6 +578,46 @@ namespace BS.Common.Ajax
         }
 
         /// <summary>
+        /// Returns the list of connections specified in the Web.config
+        /// 
+        /// If user is not part of the app support team an error is returned.
+        /// </summary>
+        /// <param name="request">The request</param>
+        /// <returns>A JSON array</returns>
+        public virtual string GetConnections(HttpRequest request)
+        {
+            IList<Entity> list = new List<Entity>();
+            LoggerHelper.Info("Start");
+            try
+            {
+                if (!CheckPermissions()) return ErrorResponse("User don't have permissions to use this functionality.");
+
+                foreach (ConnectionStringSettings connSettings in ConfigurationManager.ConnectionStrings)
+                {
+                    //LocalSqlServer,LocalMySqlServer,OraAspNetConString default connections in machine.config
+                    if ("LocalSqlServer" != connSettings.Name && "LocalMySqlServer" != connSettings.Name && "OraAspNetConString" != connSettings.Name)
+                    {
+                        Entity entity = new Entity("Connection");
+                        entity.SetProperty("ConnName", connSettings.Name);
+                        list.Add(entity);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                LoggerHelper.Error(e);
+                return ErrorResponse(e);
+            }
+            finally
+            {
+                LoggerHelper.Info("End");
+            }
+
+            return ListResponse(list);
+        }
+
+
+        /// <summary>
         /// Returns a list of tables
         /// </summary>
         /// <param name="request">The request</param>
@@ -546,7 +628,10 @@ namespace BS.Common.Ajax
             LoggerHelper.Info("Start");
             try
             {
-                list = GetPageInfoDAO().GetTables();
+                if (!CheckPermissions()) return ErrorResponse("User don't have permissions to use this functionality.");
+
+                string connName = request.Params["connName"];
+                list = GetPageInfoDAO(connName).GetTables();
             }
             catch (Exception e)
             {
@@ -569,10 +654,13 @@ namespace BS.Common.Ajax
         public virtual string GetTableColumns(HttpRequest request)
         {
             IList<Entity> list = new List<Entity>();
-            LoggerHelper.Info("Start");
+            LoggerHelper.Info("Start");            
             try
             {
-                list = GetPageInfoDAO().GetTableColumns(request.Params["tableName"]);
+                if (!CheckPermissions()) return ErrorResponse("User don't have permissions to use this functionality.");
+
+                string connName = request.Params["connName"];
+                list = GetPageInfoDAO(connName).GetTableColumns(request.Params["tableName"]);
             }
             catch (Exception e)
             {
@@ -613,6 +701,11 @@ namespace BS.Common.Ajax
             return ListResponse(list);
         }
 
+        /// <summary>
+        /// Refresh the cache page list
+        /// </summary>
+        /// <param name="request">The request</param>
+        /// <returns>A JSON array</returns>
         public string RefreshCache(HttpRequest request)
         {
             GetPageInfoDAO().RefreshCache();
@@ -621,34 +714,5 @@ namespace BS.Common.Ajax
         }
 
         # endregion
-
-        /// <summary>
-        /// Determines the search type of a request
-        /// </summary>
-        /// <param name="request">The HttpRequest</param>
-        /// <returns>The SearchType</returns>
-        protected virtual FilterInfo.SearchType GetSearchType(HttpRequest request)
-        {
-            if (FilterInfo.ContainsFilterInfo(request))
-            {
-                return (!string.IsNullOrEmpty(request.Params["searchType"]) && "or".Equals(request.Params["searchType"], StringComparison.CurrentCultureIgnoreCase)) ?
-                                FilterInfo.SearchType.OR : FilterInfo.SearchType.AND;
-            }
-
-            return (!string.IsNullOrEmpty(request.Params["searchType"]) && "and".Equals(request.Params["searchType"], StringComparison.CurrentCultureIgnoreCase)) ?
-                FilterInfo.SearchType.AND : FilterInfo.SearchType.OR;
-        }        
-        
-        /// <summary>
-        /// Returns the page configuration from the data source
-        /// </summary>
-        /// <param name="request">The HttpRequest</param>
-        /// <returns>The page config</returns>
-        private Page GetPage(HttpRequest request)
-        {
-            if (string.IsNullOrEmpty(request.Params[PageIdParam]) && string.IsNullOrEmpty(request.Params[PageNameParam])) throw new Exception("pageName can not be null.");
-
-            return GetPageInfoDAO().GetPageConfig(request.Params[PageIdParam], request.Params[PageNameParam]);
-        }
     }
 }

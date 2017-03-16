@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using BS.Common.Dao;
 using BS.Common.Entities;
-using BS.Common.Utils;
 
 namespace BS.Common.Utils
 {
@@ -981,8 +980,6 @@ namespace BS.Common.Utils
         /// <returns>The Statement Wrapper containing the SELECT statement and the statement parameters.</returns>
         public StatementWrapper BuildAggregateStatement(Entity entity, AggregateInfo aggregateInfo, Entity aggregateEntity, FilterInfo.SearchType searchType, FilterInfo filter)
         {
-            throw new NotImplementedException("Not Implemented for Oracle.");
-            /*
             if (entity == null || string.IsNullOrEmpty(entity.GetTableName()))
             {
                 LoggerHelper.Warning("Entity is null or entity TableName is not specified.");
@@ -1069,7 +1066,6 @@ namespace BS.Common.Utils
             }
 
             return new StatementWrapper(query, queryParams);
-             */
         }
 
         /// <summary>

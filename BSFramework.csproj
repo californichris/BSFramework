@@ -71,6 +71,8 @@
     <Compile Include="Ajax\AjaxBase.cs" />
     <Compile Include="Ajax\Catalog.cs" />
     <Compile Include="Ajax\PageInfo.cs" />
+    <Compile Include="Ajax\PageInfoBase.cs" />
+    <Compile Include="Ajax\QueryHelper.cs" />
     <Compile Include="Dao\BaseSqlDAO.cs" />
     <Compile Include="Dao\BasicRowProcesor.cs" />
     <Compile Include="Dao\Cache\CatalogCacheDAO.cs" />
@@ -85,8 +87,10 @@
     <Compile Include="Dao\Handlers\EntityHandler.cs" />
     <Compile Include="Dao\Handlers\PageFilterHandler.cs" />
     <Compile Include="Dao\Handlers\PageInfoHandler.cs" />
+    <Compile Include="Dao\IModulesDAO.cs" />
     <Compile Include="Dao\IPageInfoDAO.cs" />
     <Compile Include="Dao\Oracle\CatalogOracleDAO.cs" />
+    <Compile Include="Dao\Oracle\PageOracleDAO.cs" />
     <Compile Include="Dao\ResultSetHandler.cs" />
     <Compile Include="Dao\AbstractQueryRunner.cs" />
     <Compile Include="Dao\IBaseDAO.cs" />
@@ -94,6 +98,7 @@
     <Compile Include="Dao\QueryRunner.cs" />
     <Compile Include="Dao\RowProcessor.cs" />
     <Compile Include="Dao\BaseDAO.cs" />
+    <Compile Include="Dao\Service\ModulesServiceDAO.cs" />
     <Compile Include="Dao\Service\PageInfoServiceDAO.cs" />
     <Compile Include="Dao\Sql\CatalogSqlDAO.cs" />
     <Compile Include="Dao\Sql\PageSqlDAO.cs" />
@@ -116,6 +121,7 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="Utils\AggregateInfo.cs" />
+    <Compile Include="Utils\AuthorizationUtils.cs" />
     <Compile Include="Utils\BaseQueryBuilder.cs" />
     <Compile Include="Utils\DbUtils.cs" />
     <Compile Include="Utils\EntityUtils.cs" />

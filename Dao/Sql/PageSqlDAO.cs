@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using BS.Common.Entities.Page;
-using BS.Common.Utils;
+using System.Data;
 using System.Text;
 using BS.Common.Dao.Handlers;
 using BS.Common.Entities;
-using System.Data;
+using BS.Common.Entities.Page;
+using BS.Common.Utils;
 
 namespace BS.Common.Dao.Sql
 {
@@ -60,6 +60,11 @@ namespace BS.Common.Dao.Sql
             return list;
         }
 
+        /// <summary>
+        /// Returns a list of pages for the specified AppName
+        /// </summary>
+        /// <param name="appName">The application name </param>
+        /// <returns>the page list</returns>
         public virtual IList<Page> GetPageList(string appName)
         {
             LoggerHelper.Info("Start");
@@ -94,7 +99,11 @@ namespace BS.Common.Dao.Sql
             return list;
         }
 
-
+        /// <summary>
+        /// Saves the specified page configuration of the specified application name into the database.
+        /// </summary>
+        /// <param name="appName">the application name</param>
+        /// <param name="page">The page to be saved</param>
         public virtual void SavePage(string appName, Page page)
         {
             LoggerHelper.Info("Start");
@@ -160,9 +169,9 @@ namespace BS.Common.Dao.Sql
                 {
                     if (local)
                     {
-                        query.Append("INSERT INTO [Page]([Name],[Title],[TableName],[UpdatedBy],[UpdatedDate]) VALUES(");
+                        query.Append("INSERT INTO [Page]([Name],[Title],[TableName],[UpdatedBy],[UpdatedDate],[ConnName]) VALUES(");
                         query.Append("'").Append(page.Name).Append("','").Append(page.Title).Append("','").Append(page.TableName).Append("','");
-                        query.Append(page.UpdatedBy).Append("',GETDATE())").Append('\n');
+                        query.Append(page.UpdatedBy).Append("',GETDATE(),'").Append(page.ConnName).Append("')").Append('\n');
                     }
                     else
                     {
@@ -177,7 +186,7 @@ namespace BS.Common.Dao.Sql
                     {
                         query.Append("UPDATE [Page] SET [Name] = '").Append(page.Name).Append("', [Title] = '").Append(page.Title);
                         query.Append("', [TableName] = '").Append(page.TableName).Append("', [UpdatedBy] = '").Append(page.UpdatedBy);
-                        query.Append("', [UpdatedDate] = GETDATE() ");
+                        query.Append("', [UpdatedDate] = GETDATE(), [ConnName] = '").Append(page.ConnName).Append("' ");
                         query.Append("WHERE PageId = ").Append(page.PageId).Append('\n');
                     }
                     else
@@ -341,7 +350,7 @@ namespace BS.Common.Dao.Sql
                 StringBuilder query = new StringBuilder();
                 IList<DBParam> queryParams = new List<DBParam>();
 
-                query.Append("SELECT P.PageId, P.Name, P.Title, P.TableName, T.TabId, T.TabName, T.TabOrder, T.Cols, F.FieldId, F.FieldName, ");
+                query.Append("SELECT P.PageId, P.Name, P.Title, P.TableName, P.ConnName, T.TabId, T.TabName, T.TabOrder, T.Cols, F.FieldId, F.FieldName, ");
                 query.Append("F.Label, F.Type, F.Required, F.DropDownInfo, F.Exportable, F.IsId, F.FieldOrder, F.ControlType, F.JoinInfo, ");
                 query.Append("F.DBFieldName, F.Insertable, F.Updatable, F.ControlProps, ");
                 query.Append("G.ColumnId, G.Visible, G.Searchable, G.Width, G.ColumnName, G.ColumnLabel, G.ColumnOrder ");
@@ -383,9 +392,11 @@ namespace BS.Common.Dao.Sql
         }
 
         /// <summary>
-        /// Returns the Page Configuration from the data base depending on the page information.
+        /// Returns the Page Configuration from the data base for the specified application name and pageId or pageName
         /// </summary>
-        /// <param name="page">The page object containing the data necesary to retrieved the configuration</param>
+        /// <param name="appName">The application name</param>
+        /// <param name="pageId">The id of the page</param>
+        /// <param name="pageName">The name of the page</param>
         /// <returns>The Page</returns>
         public virtual Page GetPageConfig(string appName, string pageId, string pageName)
         {
@@ -404,7 +415,7 @@ namespace BS.Common.Dao.Sql
                 StringBuilder query = new StringBuilder();
                 IList<DBParam> queryParams = new List<DBParam>();
 
-                query.Append("SELECT A.PageAppId, A.AppName, P.PageId, P.Name, P.Title, P.TableName, T.TabId, T.TabName, T.TabOrder, T.Cols, F.FieldId, F.FieldName, ");
+                query.Append("SELECT A.PageAppId, A.AppName, P.PageId, P.Name, P.Title, P.TableName, P.ConnName, T.TabId, T.TabName, T.TabOrder, T.Cols, F.FieldId, F.FieldName, ");
                 query.Append("F.Label, F.Type, F.Required, F.DropDownInfo, F.Exportable, F.IsId, F.FieldOrder, F.ControlType, F.JoinInfo, ");
                 query.Append("F.DBFieldName, F.Insertable, F.Updatable, F.ControlProps, ");
                 query.Append("G.ColumnId, G.Visible, G.Searchable, G.Width, G.ColumnName, G.ColumnLabel, G.ColumnOrder ");
@@ -448,7 +459,11 @@ namespace BS.Common.Dao.Sql
             return _page;
         }
 
-
+        /// <summary>
+        /// Returns the page filter for the specified page
+        /// </summary>
+        /// <param name="pageId">the page id</param>
+        /// <returns>the page filter</returns>
         public virtual PageFilter GetPageFilter(string pageId)
         {
             LoggerHelper.Info("Start");
@@ -642,6 +657,9 @@ namespace BS.Common.Dao.Sql
             return list;
         }
 
+        /// <summary>
+        /// This method does not applied for database implementations
+        /// </summary>
         public void RefreshCache()
         {
             throw new NotImplementedException("This method is not available for sql implementation.");

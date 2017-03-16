@@ -1,11 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using BS.Common.Dao.Handlers;
 using BS.Common.Entities;
 using BS.Common.Utils;
-using BS.Common.Dao.Handlers;
-using System.Collections;
-using System.Data;
 
 namespace BS.Common.Dao.Sql
 {
@@ -442,6 +441,7 @@ namespace BS.Common.Dao.Sql
             }
             catch (Exception e)
             {
+                LoggerHelper.Error(e.Message);
                 if (e.Message.Contains("FK") || e.Message.Contains("REFERENCE"))
                 {
                     throw new Exception("Entity cannot be deleted, because is being used.");
@@ -454,6 +454,7 @@ namespace BS.Common.Dao.Sql
                 {
                     throw new Exception("Unable to execute transactions.", e);
                 }
+                
             }
             finally
             {

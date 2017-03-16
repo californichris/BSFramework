@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using BS.Common.Dao.Handlers;
 using BS.Common.Entities;
 using BS.Common.Utils;
-using BS.Common.Dao.Handlers;
 
 namespace BS.Common.Dao.Oracle
 {
@@ -143,6 +143,8 @@ namespace BS.Common.Dao.Oracle
         {
             return FindEntities(entity, null, searchType);
         }
+
+        /// <summary>        
         /// Find all entities that meet the specified entity type and properties from an Oracle database.
         /// </summary>
         /// <param name="entity">The entity type</param>
@@ -296,6 +298,17 @@ namespace BS.Common.Dao.Oracle
                 LoggerHelper.Info("End");
             }
         }
+
+        /// <summary>
+        /// Updates all entities that math the specified whereEntity properties in an Oracle database.
+        /// </summary>
+        /// <param name="entity">The entity that contains the properties that will be updated.</param>
+        /// <param name="whereEntity">The entity that contains the properties used in the WHERE clause.</param>
+        public void UpdateEntity(Entity entity, Entity whereEntity)
+        {
+            throw new NotImplementedException("This method is not implemented.");
+        }
+
         /// <summary>
         /// Deletes all entities that match the specified entity properties from an Oracle database.
         /// </summary>
@@ -344,16 +357,35 @@ namespace BS.Common.Dao.Oracle
             }
         }
 
+        /// <summary>
+        /// Executes a transaction in an Oracle database.
+        /// </summary>
+        /// <param name="operations">The list of operations to be executed.</param>
         public virtual void ExecuteTransaction(List<TransOperation> operations)
         {
             throw new NotImplementedException("This method is not available in offline mode.");
         }
 
+        /// <summary>
+        /// Returns the result of the specified aggregated function(s) executed in an Oracle Database.
+        /// </summary>
+        /// <param name="entity">The entity type</param>
+        /// <param name="aggregateInfo">The aggregateInfo data</param>
+        /// <param name="searchType">The search type</param>
+        /// <returns>The agregated list of entities</returns>
         public virtual IList<Entity> GetAggregateEntities(Entity entity, AggregateInfo aggregateInfo, FilterInfo.SearchType searchType)
         {
             throw new NotImplementedException("This method is not available in offline mode.");
         }
 
+        /// <summary>
+        /// Returns the result of the specified aggregated function(s) executed in an Oracle Database.
+        /// </summary>
+        /// <param name="entity">The entity type</param>
+        /// <param name="aggregateInfo">The aggregateInfo data</param>
+        /// <param name="searchType">The search type</param>
+        /// <param name="filter">The filter info</param>
+        /// <returns>The agregated list of entities</returns>
         public IList<Entity> GetAggregateEntities(Entity entity, AggregateInfo aggregateInfo, FilterInfo.SearchType searchType, FilterInfo filter)
         {
             throw new NotImplementedException("This method is not available in offline mode.");

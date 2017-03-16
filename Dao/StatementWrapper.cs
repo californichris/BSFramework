@@ -34,11 +34,18 @@ namespace BS.Common.Dao
             set { this._DBParams = value; }
         }
 
+        /// <summary>
+        /// Creates an empty StatementWrapper instance
+        /// </summary>
         public StatementWrapper()
         {
-
         }
 
+        /// <summary>
+        /// Creates an StatementWrapper instance with the specified query and dbParams
+        /// </summary>
+        /// <param name="query">The parameterized query.</param>
+        /// <param name="dbParams">The list of parameters required to execute the query.</param>
         public StatementWrapper(StringBuilder query, IList<DBParam> dbParams)
         {
             this.Query = query;

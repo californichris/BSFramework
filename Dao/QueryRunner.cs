@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Text;
-using System.Data.Common;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
+using System.Text;
 using BS.Common.Utils;
 
 namespace BS.Common.Dao
@@ -223,7 +223,26 @@ namespace BS.Common.Dao
                 cmd.CommandText = stmtWrapper.Query.ToString();
                 SetParameters(cmd, stmtWrapper.DBParams);
 
-                newId = int.Parse(cmd.ExecuteScalar().ToString());
+                //This check id for the Oracle Implementation
+                //Because the only way to get the new id is has an output param and
+                //executing a NonQuery operation
+                DBParam idparam;
+                if (HasOutputParams(stmtWrapper, out idparam))
+                {
+                    DbParameter idOutputParam = cmd.CreateParameter();
+                    idOutputParam.ParameterName = idparam.ParamName;
+                    idOutputParam.DbType = idparam.ParamType;
+                    idOutputParam.Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(idOutputParam);
+
+                    cmd.ExecuteNonQuery();
+
+                    newId = Convert.ToInt32(idOutputParam.Value);
+                }
+                else
+                {
+                    newId = int.Parse(cmd.ExecuteScalar().ToString());
+                }
             }
             finally
             {
@@ -402,6 +421,19 @@ namespace BS.Common.Dao
             }
         }
 
+
+        private bool HasOutputParams(StatementWrapper stmtWrapper, out DBParam param)
+        {
+            IList<DBParam> stmParams = stmtWrapper.DBParams;
+            param = ((List<DBParam>)stmParams).Find(x => x.Direction == ParameterDirection.Output);
+            if (param == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Sets the DB command parameters 
         /// </summary>
@@ -411,8 +443,12 @@ namespace BS.Common.Dao
         {
             for (int i = 0; i < stmParams.Count; i++)
             {
+                //Output params will be added outside of this method
+                if (stmParams[i].Direction == ParameterDirection.Output) continue;
+
                 DbParameter p = cmd.CreateParameter();
                 p.ParameterName = stmParams[i].ParamName;
+
                 if (stmParams[i].IsLike)
                 {
                     p.Value = "%" + stmParams[i].ParamValue + "%";

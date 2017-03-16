@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using BS.Common.Entities;
 using System.Data.Common;
+using BS.Common.Entities;
 
 namespace BS.Common.Dao.Handlers
 {

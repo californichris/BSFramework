@@ -11,6 +11,9 @@ namespace BS.Common.Dao
     ///     <change date="07/31/2013" author="Christian Beltran">
     ///         Initial Version.
     ///     </change>
+    ///     <change date="12/01/2016" author="Christian Beltran">
+    ///         Added execute transaction and getAggregatedEntities methods.
+    ///     </change>
     /// </history>
     public interface ICatalogDAO : IBaseDAO
     {
@@ -81,13 +84,24 @@ namespace BS.Common.Dao
         /// </summary>
         /// <param name="entity">The entity to be updated</param>
         void UpdateEntity(Entity entity);
-        
+
+        /// <summary>
+        /// Updates all entities that math the specified whereEntity properties in the datasource.
+        /// </summary>
+        /// <param name="entity">The entity that contains the properties that will be updated.</param>
+        /// <param name="whereEntity">The entity that contains the properties used in the WHERE clause.</param>
+        void UpdateEntity(Entity entity, Entity whereEntity);
+
         /// <summary>
         /// Deletes all entities that match the specified entity properties from the datasource.
         /// </summary>
         /// <param name="entity">The entity that contains the properties.</param>
         void DeleteEntities(Entity entity);
 
+        /// <summary>
+        /// Executes a transaction in the datasource.
+        /// </summary>
+        /// <param name="operations">The list of operations to be executed.</param>
         void ExecuteTransaction(List<TransOperation> operations);
 
         /// <summary>
@@ -105,8 +119,23 @@ namespace BS.Common.Dao
         /// <returns>The filtered number of records</returns>
         int GetFilteredTotalRecords(Entity entity, FilterInfo filter);
 
+        /// <summary>
+        /// Returns the result of the specified aggregated function(s).
+        /// </summary>
+        /// <param name="entity">The entity type</param>
+        /// <param name="aggregateInfo">The aggregateInfo data</param>
+        /// <param name="searchType">The search type</param>
+        /// <returns>The agregated list of entities</returns>
         IList<Entity> GetAggregateEntities(Entity entity, AggregateInfo aggregateInfo, FilterInfo.SearchType searchType);
 
+        /// <summary>
+        /// Returns the result of the specified aggregated function(s).
+        /// </summary>
+        /// <param name="entity">The entity type</param>
+        /// <param name="aggregateInfo">The aggregateInfo data</param>
+        /// <param name="searchType">The search type</param>
+        /// <param name="filter">The filter info</param>
+        /// <returns>The agregated list of entities</returns>
         IList<Entity> GetAggregateEntities(Entity entity, AggregateInfo aggregateInfo, FilterInfo.SearchType searchType, FilterInfo filter);
     }
 }

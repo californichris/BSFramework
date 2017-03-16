@@ -249,6 +249,16 @@ namespace BS.Common.Dao.File
         }
 
         /// <summary>
+        /// Updates all entities that math the specified whereEntity properties in the file datasource.
+        /// </summary>
+        /// <param name="entity">The entity that contains the properties that will be updated.</param>
+        /// <param name="whereEntity">The entity that contains the properties used in the WHERE clause.</param>
+        public void UpdateEntity(Entity entity, Entity whereEntity)
+        {
+            throw new NotImplementedException("This method is not available in offline mode.");  
+        }
+
+        /// <summary>
         /// This method is not implemented for file type catalogs.
         /// </summary>
         /// <param name="entity">The entity that contains the properties.</param>
@@ -257,16 +267,35 @@ namespace BS.Common.Dao.File
             throw new NotImplementedException("This method is not available in offline mode.");               
         }
 
+        /// <summary>
+        /// Executes a transaction in the file datasource.
+        /// </summary>
+        /// <param name="operations">The list of operations to be executed.</param>
         public virtual void ExecuteTransaction(List<TransOperation> operations)
         {
             throw new NotImplementedException("This method is not available in offline mode.");               
         }
 
+        /// <summary>
+        /// Returns the result of the specified aggregated function(s).
+        /// </summary>
+        /// <param name="entity">The entity type</param>
+        /// <param name="aggregateInfo">The aggregateInfo data</param>
+        /// <param name="searchType">The search type</param>
+        /// <returns>The agregated list of entities</returns>
         public virtual IList<Entity> GetAggregateEntities(Entity entity, AggregateInfo aggregateInfo, FilterInfo.SearchType searchType)
         {
             throw new NotImplementedException("This method is not available in offline mode."); 
         }
 
+        /// <summary>
+        /// Returns the result of the specified aggregated function(s).
+        /// </summary>
+        /// <param name="entity">The entity type</param>
+        /// <param name="aggregateInfo">The aggregateInfo data</param>
+        /// <param name="searchType">The search type</param>
+        /// <param name="filter">The filter info</param>
+        /// <returns>The agregated list of entities</returns>
         public IList<Entity> GetAggregateEntities(Entity entity, AggregateInfo aggregateInfo, FilterInfo.SearchType searchType, FilterInfo filter)
         {
             throw new NotImplementedException("This method is not available in offline mode."); 

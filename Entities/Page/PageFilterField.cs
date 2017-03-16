@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace BS.Common.Entities.Page
 {
+    /// <summary>
+    /// Represents a page filter on the screen
+    /// </summary>
     public class PageFilterField
     {
         /// <summary>

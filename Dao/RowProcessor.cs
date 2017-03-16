@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using BS.Common.Entities;
 using System.Data.Common;
 
 namespace BS.Common.Dao

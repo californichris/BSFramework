@@ -47,6 +47,11 @@ namespace BS.Common.Entities.Page
         public string UpdatedDate { get; set; }
 
         /// <summary>
+        /// Connection Name
+        /// </summary>
+        public string ConnName { get; set; }
+
+        /// <summary>
         /// The page grid fields
         /// </summary>
         public List<PageGridColumn> GridFields

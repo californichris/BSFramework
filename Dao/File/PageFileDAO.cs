@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using BS.Common.Entities.Page;
-using BS.Common.Entities;
 using System.Web.Script.Serialization;
+using BS.Common.Entities;
+using BS.Common.Entities.Page;
 using BS.Common.Utils;
 
 namespace BS.Common.Dao.File
@@ -174,6 +174,9 @@ namespace BS.Common.Dao.File
             throw new NotImplementedException("This method is not available in offline mode.");
         }
 
+        /// <summary>
+        /// Refresh the pache cache. 
+        /// </summary>
         public void RefreshCache()
         {
             throw new NotImplementedException("This method is not available for file implementation.");

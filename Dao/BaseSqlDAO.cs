@@ -13,7 +13,11 @@ namespace BS.Common.Dao
     /// </summary>
     public class BaseSqlDAO : BaseDAO
     {
-        private static readonly string DefaultConnString = "DBConnString";
+        /// <summary>
+        /// Default connection string name
+        /// </summary>
+        public static readonly string DefaultConnString = "DBConnString";
+
         private string ConnString;
         private QueryRunner queryRunner;
         private IQueryBuilder queryBuilder;

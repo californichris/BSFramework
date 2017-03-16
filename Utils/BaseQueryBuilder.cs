@@ -1,6 +1,5 @@
 ﻿using System;
 using BS.Common.Entities;
-using BS.Common.Utils;
 
 namespace BS.Common.Utils
 {

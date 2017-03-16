@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Data;
-using BS.Common.Entities;
-using System.Data.Common;
 using System.Configuration;
+using System.Data;
+using System.Data.Common;
+using System.Linq;
+using BS.Common.Entities;
 using BS.Common.Utils;
 
 

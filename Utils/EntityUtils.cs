@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Web.Script.Serialization;
 using BS.Common.Entities;
 using BS.Common.Entities.Page;
-using System.Web.Script.Serialization;
 
 namespace BS.Common.Utils
 {
@@ -131,7 +131,7 @@ namespace BS.Common.Utils
         /// <returns>The field data type</returns>
         public static Field.DBType GetFieldDataType(PageField field)
         {
-            if (field.Type == "datetime")
+            if (field.Type.Contains("time"))
             {
                 return Field.DBType.DateTime;
             }
@@ -151,7 +151,14 @@ namespace BS.Common.Utils
             {
                 return Field.DBType.Bit;
             }
-
+            if (field.Type == "varbinary")
+            {
+                return Field.DBType.Varbinary;
+            }
+            if (field.Type == "encrypt")
+            {
+                return Field.DBType.Encrypt;
+            }
             return Field.DBType.Varchar;
         }
 
@@ -164,5 +171,36 @@ namespace BS.Common.Utils
         public static bool IsForeignKey(PageField field, Page page) {
             return !string.IsNullOrEmpty(field.JoinInfo);
         }
+
+        public static IList<Entity> DeserializeEntityList(string json)
+        {
+            return DeserializeEntityList(null, json);
+        }
+
+        public static IList<Entity> DeserializeEntityList(Entity entity, string json)
+        {
+            EntityConverter converter = (entity == null) ? new EntityConverter() : new EntityConverter(entity);
+
+            IList<Entity> list = new List<Entity>();
+            JavaScriptSerializer ser = new JavaScriptSerializer();
+            ser.MaxJsonLength = int.MaxValue;
+            ser.RegisterConverters(new JavaScriptConverter[] { converter });
+            list = (List<Entity>)ser.Deserialize(json, typeof(IList<Entity>));
+
+            return list;
+        }
+
+        public static string SerializeEntityList(IList<Entity> list)
+        {
+            EntityConverter converter = new EntityConverter();
+            JavaScriptSerializer ser = new JavaScriptSerializer();
+            ser.MaxJsonLength = int.MaxValue;
+            ser.RegisterConverters(new JavaScriptConverter[] { converter });
+
+            string data = ser.Serialize(list);
+
+            return "[" + data + "]";
+        }
+
     }
 }

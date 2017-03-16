@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Practices.EnterpriseLibrary.Logging;
-using System.Collections.Generic;
 
 namespace BS.Common.Utils
 {
